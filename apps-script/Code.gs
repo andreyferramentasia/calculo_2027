@@ -21,6 +21,16 @@ const TOLERANCIA_S = 4;      // atraso de rede aceito no cronômetro
 const SESSAO_S = 21600;      // 6 h (máximo do CacheService)
 const PARTICULAS = ['da', 'de', 'do', 'das', 'dos', 'e'];
 
+/* Matérias que aparecem no painel (mesmos ids de js/hub.js).
+   As perguntas de cada uma ficam em Questoes.gs. */
+const MATERIAS = [
+  { id: 'calculo', titulo: 'Cálculo Diferencial e Integral I' },
+  { id: 'discreta', titulo: 'Matemática Discreta' },
+  { id: 'probabilidade', titulo: 'Probabilidade e Estatística' },
+  { id: 'requisitos', titulo: 'Engenharia de Requisitos' },
+  { id: 'agro', titulo: 'Computação Aplicada ao Agronegócio e Sustentabilidade' }
+];
+
 function doGet() {
   return json_({ ok: true });
 }
@@ -200,11 +210,12 @@ function admin_(fn) {
 function adminEstado() {
   const lib = liberadosMapa_();
   return {
-    materias: Object.keys(QUESTOES).map(function (m) {
-      const secs = QUESTOES[m].secoes || {};
+    materias: MATERIAS.map(function (mat) {
+      const m = mat.id;
+      const secs = secoesDe_(m);
       return {
         id: m,
-        titulo: QUESTOES[m].titulo,
+        titulo: mat.titulo,
         secoes: Object.keys(secs).map(function (id) {
           return { id: id, titulo: secs[id].titulo, total: secs[id].perguntas.length, liberado: (lib[m] || []).indexOf(id) >= 0 };
         })
@@ -242,7 +253,7 @@ function adminApagar(d) {
   const ano = String(d.ano || '');
   const chave = chaveNome_(String(d.nome || ''));
   const secao = String(d.secao || '');
-  const secoes = secao === 'todas' && QUESTOES[materia] ? Object.keys(QUESTOES[materia].secoes || {}) : [secao];
+  const secoes = secao === 'todas' ? Object.keys(secoesDe_(materia)) : [secao];
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(20000)) falha_(503, 'Servidor ocupado.');
   try {
@@ -262,7 +273,7 @@ function adminApagar(d) {
    { materia (obrigatório), secao: 'geral' | id, ano: 'todos' | 2026 } */
 function adminLimpar(d) {
   const materia = String(d.materia || '');
-  if (!QUESTOES[materia]) falha_(404, 'Matéria inexistente.');
+  if (!MATERIAS.some(function (m) { return m.id === materia; })) falha_(404, 'Matéria inexistente.');
   const secao = String(d.secao || 'geral');
   const ano = String(d.ano || 'todos');
   const lock = LockService.getScriptLock();
@@ -296,9 +307,19 @@ function falha_(status, msg) {
   throw e;
 }
 
+/* seções (com perguntas) de uma matéria. Aceita os dois formatos de Questoes.gs:
+   novo:   QUESTOES = { calculo: { secoes: { fundamentos: {...} } } }
+   antigo: QUESTOES = { fundamentos: {...} }   (vale como Cálculo) */
+function secoesDe_(materia) {
+  const Q = typeof QUESTOES === 'object' && QUESTOES ? QUESTOES : {};
+  const antigo = Object.keys(Q).some(function (k) { return Q[k] && Q[k].perguntas; });
+  if (antigo) return materia === 'calculo' ? Q : {};
+  return (Q[materia] && Q[materia].secoes) || {};
+}
+
 function secao_(materia, secao) {
-  const m = QUESTOES[materia];
-  return m && m.secoes && Object.prototype.hasOwnProperty.call(m.secoes, secao) ? m.secoes[secao] : null;
+  const secs = secoesDe_(materia);
+  return Object.prototype.hasOwnProperty.call(secs, secao) && secs[secao].perguntas ? secs[secao] : null;
 }
 
 function liberadosMapa_() {
