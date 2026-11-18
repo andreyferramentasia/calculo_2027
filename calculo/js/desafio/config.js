@@ -4,4 +4,4 @@
    Não é senha: é só o endereço. Senha e respostas ficam no Google.
    ========================================================= */
 window.ALG = window.ALG || {};
-window.ALG.DESAFIO_API = '';   // ex.: 'https://script.google.com/macros/s/XXXXXXXX/exec'
+window.ALG.DESAFIO_API = 'https://script.google.com/macros/s/AKfycbychGXpHC5ae9ERD7tLfCFazXMpnw2Qs-ChnW8gq9YrUUbNlyf_ENxN6ANzn3ziVaMeBw/exec';
