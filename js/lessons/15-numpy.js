@@ -1,8 +1,8 @@
-/* Aula 16 — NumPy */
+/* Aula 15 — NumPy */
 (function (A) {
   var NP = A.NP;
   A.lesson({
-    id: 'numpy', module: 'm4', num: 16, minutes: 30,
+    id: 'numpy', module: 'm4', num: 15, minutes: 30,
     title: 'NumPy: vetores e matrizes de verdade',
     goals: ['np.array', 'Vetorização', 'reshape · @'],
     body: [

@@ -293,16 +293,20 @@
      --------------------------------------------------------- */
   A.viz.branch = function (el, d) {
     if (!d) { el.innerHTML = ''; return; }
-    var decided = false;
+    // "decided" por nível de indentação: num if aninhado, o if de dentro
+    // não é apagado só porque o de fora já foi escolhido
+    var decided = {};
     el.innerHTML = '<div class="vbr">' + d.rows.map(function (r) {
+      var lv = r.ind || 0;
+      Object.keys(decided).forEach(function (k) { if (+k > lv) delete decided[k]; });
       var cls = 'vbr-row';
       if (r.val === true) cls += ' t';
       if (r.val === false) cls += ' f';
       if (r.run) cls += ' run';
-      if (decided && r.val === null) cls += ' skip';
-      if (r.val === true) decided = true;
+      if (r.skip || (decided[lv] && r.val === null)) cls += ' skip';
+      if (r.val === true) decided[lv] = true;
       var res = r.val === true ? (r.k === 'else' ? 'entra' : 'True') : r.val === false ? 'False' : '';
-      return '<div class="' + cls + '"><span class="kw">' + r.k + '</span><span>' + A.esc(r.e || '(senão)') +
+      return '<div class="' + cls + '" style="margin-left:' + (lv * 28) + 'px"><span class="kw">' + r.k + '</span><span>' + A.esc(r.e || '(senão)') +
         ' <span class="muted">→ ' + A.esc(r.b) + '</span></span><span class="res">' + res + '</span></div>';
     }).join('') + '</div>';
   };

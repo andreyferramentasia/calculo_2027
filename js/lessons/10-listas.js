@@ -3,7 +3,7 @@
   A.lesson({
     id: 'listas', module: 'm3', num: 10, minutes: 25,
     title: 'Listas (vetores)',
-    goals: ['Listas', 'append', 'Maior elemento'],
+    goals: ['Listas', 'append', 'Maior elemento', 'List comprehension'],
     body: [
       { html: '<p>Lista (<b>vetor</b>) = vários valores numa variável, em ordem. Pode alterar.</p>' },
       { code: 'notas = [7.5, 8.0, 6.5, 9.0]\nprint(notas[0])      # primeiro elemento\nprint(notas[-1])     # último\nprint(len(notas))    # quantidade\nnotas[2] = 7.0       # altera o elemento de índice 2\nnotas.append(10.0)   # adiciona no final\nprint(notas)', out: '7.5\n9.0\n4\n[7.5, 8.0, 7.0, 9.0, 10.0]' },
@@ -59,6 +59,34 @@
         { title: 'Loop tradicional', code: 'pares = []\nfor x in range(10):\n    if x % 2 == 0:\n        pares.append(x)' },
         { title: 'List comprehension', code: 'pares = [x for x in range(10) if x % 2 == 0]\n# [0, 2, 4, 6, 8]' }
       ] },
+      { html: '<p>Lendo da esquerda para a direita: <b>[o que guardar</b> &nbsp;<code>for</code> cada item &nbsp;<code>if</code> condição<b>]</b>.</p>' },
+      { lab: {
+        title: 'Quadrados dos pares',
+        params: { n: 8 },
+        viz: ['array', 'trail'],
+        code: function (P) { var n = Math.max(1, Math.min(12, Math.trunc(P.n))); return 'quad = [x ** 2 for x in range(1, ' + (n + 1) + ') if x % 2 == 0]\nprint(quad)'; },
+        gen: function* (P) {
+          var n = Math.max(1, Math.min(12, Math.trunc(P.n))), seq = [], ok = [], dim = [], res = [];
+          for (var k = 1; k <= n; k++) seq.push(k);
+          function Z(pos) {
+            return {
+              array: { arr: seq, ptr: { x: pos }, hl: pos === null ? [] : [pos], ok: ok.slice(), dim: dim.slice(), label: 'range(1, ' + (n + 1) + ')' },
+              trail: { label: 'quad sendo montada:', items: res.slice() }
+            };
+          }
+          for (k = 0; k < seq.length; k++) {
+            var x = seq[k], c = x % 2 === 0;
+            yield { l: 1, v: { x: x }, it: k + 1, viz: Z(k), n: '<b>for</b>: pega <code>x = ' + x + '</code>.' };
+            yield { l: 1, v: { x: x }, it: k + 1, c: ['x % 2 == 0', c], viz: Z(k), n: c ? '<b>if</b>: é par, passa no filtro.' : '<b>if</b>: é ímpar, fica de fora.' };
+            if (c) {
+              res.push(x * x); ok.push(k);
+              yield { l: 1, v: { x: x }, it: k + 1, viz: Z(k), n: '<b>o que guardar</b>: <code>x ** 2</code> = ' + (x * x) + ' entra na lista.' };
+            } else dim.push(k);
+          }
+          yield { l: 1, v: { quad: res }, viz: Z(null), n: 'A lista pronta vai para <code>quad</code>. (Repare: o <code>x</code> da comprehension não fica na memória depois.)' };
+          yield { l: 2, v: { quad: res }, viz: Z(null), p: A.repr(res) };
+        }
+      } },
       { warn: '<p><code>b = a</code> <b>não copia</b>: é a mesma lista. Use <code>b = a.copy()</code>.</p>' }
     ],
     quiz: [

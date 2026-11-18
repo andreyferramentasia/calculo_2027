@@ -79,8 +79,77 @@
         }
       } },
       { tip: '<p>Teste 1900 e 2000.</p>' },
-      { h2: 'if sem else e ifs aninhados' },
-      { code: 'x = -4\nif x < 0:\n    x = -x          # valor absoluto\nprint(x)\n\nidade = 20\ntem_carteira = True\nif idade >= 18:\n    if tem_carteira:\n        print("Pode dirigir")\n    else:\n        print("Precisa tirar a carteira")', out: '4\nPode dirigir' },
+      { h2: 'if sem else' },
+      { html: '<p>O <code>else</code> é opcional: se a condição for False, o bloco é só <b>pulado</b>. Tente <code>x = 7</code>.</p>' },
+      { lab: {
+        title: 'Valor absoluto',
+        params: { x: -4 },
+        viz: 'branch',
+        code: function (P, r) { return 'x = ' + r(P.x) + '\nif x < 0:\n    x = -x\nprint(x)'; },
+        gen: function* (P) {
+          var x = P.x;
+          function num(v) { return Number.isInteger(v) ? v : A.F(v); }
+          var rows = [{ k: 'if', e: 'x < 0', b: 'x = -x', val: null, run: false }];
+          yield { l: 1, v: { x: num(x) }, viz: { rows: rows } };
+          var c = x < 0;
+          rows[0].val = c;
+          yield { l: 2, v: { x: num(x) }, c: ['x < 0', c], viz: { rows: rows }, n: c ? 'Negativo: entra no bloco.' : 'Não é negativo: como <b>não há else</b>, o bloco é pulado e o programa segue.' };
+          if (c) {
+            rows[0].run = true;
+            x = -x;
+            yield { l: 3, v: { x: num(x) }, viz: { rows: rows }, n: '<code>x = -x</code> troca o sinal: agora <code>x</code> vale ' + A.repr(num(x)) + '.' };
+          }
+          yield { l: 4, v: { x: num(x) }, viz: { rows: rows }, p: A.str(num(x)), n: 'O print está fora do if: roda sempre.' };
+        }
+      } },
+      { h2: 'ifs aninhados' },
+      { html: '<p>Um <code>if</code> dentro de outro: o de dentro <b>só é testado</b> se o de fora for True. Mude <code>idade</code> e <code>tem_carteira</code> (True/False).</p>' },
+      { lab: {
+        title: 'Pode dirigir?',
+        params: { idade: 20, tem_carteira: 'True' },
+        viz: 'branch',
+        code: function (P) {
+          var tc = /^(true|1|sim|s)$/i.test(String(P.tem_carteira).trim()) ? 'True' : 'False';
+          return 'idade = ' + Math.trunc(P.idade) + '\ntem_carteira = ' + tc + '\nif idade >= 18:\n    if tem_carteira:\n        print("Pode dirigir")\n    else:\n        print("Precisa tirar a carteira")\nelse:\n    print("Ainda não pode dirigir")';
+        },
+        gen: function* (P) {
+          var idade = Math.trunc(P.idade);
+          var tc = /^(true|1|sim|s)$/i.test(String(P.tem_carteira).trim());
+          var rows = [
+            { k: 'if', e: 'idade >= 18', b: '(if de dentro)', val: null },
+            { k: 'if', e: 'tem_carteira', b: '"Pode dirigir"', val: null, ind: 1 },
+            { k: 'else', e: '', b: '"Precisa tirar a carteira"', val: null, ind: 1 },
+            { k: 'else', e: '', b: '"Ainda não pode dirigir"', val: null }
+          ];
+          function B() { return { rows: rows }; }
+          yield { l: 1, v: { idade: idade }, viz: B() };
+          yield { l: 2, v: { idade: idade, tem_carteira: tc }, viz: B() };
+          var c1 = idade >= 18;
+          rows[0].val = c1;
+          yield { l: 3, v: { idade: idade, tem_carteira: tc }, c: ['idade >= 18', c1], viz: B(), n: c1 ? 'Maior de idade: entra e vai testar o <b>if de dentro</b>.' : 'Menor de idade: o if de dentro <b>nem é testado</b>. Pula direto para o else de fora.' };
+          if (c1) {
+            rows[0].run = true;
+            var c2 = tc;
+            rows[1].val = c2;
+            yield { l: 4, v: { idade: idade, tem_carteira: tc }, c: ['tem_carteira', c2], viz: B(), n: 'Agora sim o if de dentro é testado.' };
+            if (c2) {
+              rows[1].run = true;
+              yield { l: 5, v: { idade: idade, tem_carteira: tc }, viz: B(), p: 'Pode dirigir' };
+            } else {
+              rows[2].val = true;
+              yield { l: 6, v: { idade: idade, tem_carteira: tc }, viz: B() };
+              rows[2].run = true;
+              yield { l: 7, v: { idade: idade, tem_carteira: tc }, viz: B(), p: 'Precisa tirar a carteira' };
+            }
+          } else {
+            rows[1].skip = true; rows[2].skip = true;
+            rows[3].val = true;
+            yield { l: 8, v: { idade: idade, tem_carteira: tc }, viz: B() };
+            rows[3].run = true;
+            yield { l: 9, v: { idade: idade, tem_carteira: tc }, viz: B(), p: 'Ainda não pode dirigir' };
+          }
+        }
+      } },
     ],
     quiz: [
       { q: 'O que imprime?', code: 'x = 10\nif x > 5:\n    print("A")\nelif x > 8:\n    print("B")\nelse:\n    print("C")', options: ['A', 'B', 'A e B', 'C'], answer: 0, explain: 'A primeira condição verdadeira vence; os elif seguintes nem são testados.' },

@@ -1,7 +1,7 @@
-/* Aula 13 — Matrizes */
+/* Aula 12 — Matrizes */
 (function (A) {
   A.lesson({
-    id: 'matrizes', module: 'm3', num: 13, minutes: 25,
+    id: 'matrizes', module: 'm3', num: 12, minutes: 25,
     title: 'Matrizes (listas de listas)',
     goals: ['m[i][j]', 'Loops aninhados', 'Diagonal'],
     body: [

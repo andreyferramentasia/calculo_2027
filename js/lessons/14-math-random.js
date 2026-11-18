@@ -1,8 +1,8 @@
-/* Aula 15 — Bibliotecas: math e random */
+/* Aula 14 — Bibliotecas: math e random */
 (function (A) {
   var F = A.F;
   A.lesson({
-    id: 'math-random', module: 'm4', num: 15, minutes: 25,
+    id: 'math-random', module: 'm4', num: 14, minutes: 25,
     title: 'Bibliotecas: math e random',
     goals: ['import', 'math', 'random'],
     body: [

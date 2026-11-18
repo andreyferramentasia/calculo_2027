@@ -1,10 +1,10 @@
-/* Aula 14 — Operações com matrizes */
+/* Aula 13 — Operações com matrizes */
 (function (A) {
   function zeros(r, c) { var m = []; for (var i = 0; i < r; i++) { m.push([]); for (var j = 0; j < c; j++) m[i].push(0); } return m; }
   function cp(m) { return m.map(function (r) { return r.slice(); }); }
 
   A.lesson({
-    id: 'operacoes-matrizes', module: 'm3', num: 14, minutes: 30,
+    id: 'operacoes-matrizes', module: 'm3', num: 13, minutes: 30,
     title: 'Operações com matrizes',
     goals: ['A + B', 'Transposta', 'A × B'],
     body: [
