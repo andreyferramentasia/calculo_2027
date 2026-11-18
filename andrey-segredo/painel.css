@@ -57,3 +57,18 @@
 @media (max-width: 700px) {
   .prof-table { display: block; overflow-x: auto; }
 }
+
+/* tela de login centralizada */
+.prof-login { margin: 0 auto; width: 100%; }
+.prof:has(#login:not([hidden])) {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.prof:has(#login:not([hidden])) .lesson-head {
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto 22px;
+}
