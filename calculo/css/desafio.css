@@ -8,7 +8,8 @@
 .content.desafio { user-select: none; -webkit-user-select: none; }
 .content.desafio input { user-select: text; -webkit-user-select: text; }
 
-.d-stage { max-width: 980px; }
+.d-stage { max-width: 980px; margin: 0 auto; }
+.content.desafio .lesson-head { max-width: 980px; margin-left: auto; margin-right: auto; }
 
 .d-card {
   background: var(--panel);
@@ -28,7 +29,7 @@
 }
 
 /* ---------- entrada ---------- */
-.d-entrada { max-width: 520px; display: grid; gap: 14px; }
+.d-entrada { max-width: 520px; margin: 0 auto; display: grid; gap: 14px; }
 .d-entrada h2 { margin: 0; }
 .d-entrada p { margin: 0; }
 .d-entrada label { display: grid; gap: 6px; font-weight: 700; font-size: .92rem; }
