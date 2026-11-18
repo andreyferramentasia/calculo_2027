@@ -106,9 +106,7 @@
           yield { l: 11, v: V(1, 1, 1), viz: Z(null), p: A.repr(C), n: 'O corpo do loop mais interno rodou 2 × 2 × 2 = <b>8</b> vezes. Para matrizes n×n são n³ multiplicações.' };
         }
       } },
-      { warn: '<p>A×B ≠ B×A &nbsp;·&nbsp; (m×<b>n</b>)·(<b>n</b>×p) = m×p</p>' },
-      { h2: 'Versão genérica' },
-      { code: 'def multiplica(A, B):\n    m, n, p = len(A), len(B), len(B[0])\n    if len(A[0]) != n:\n        raise ValueError("colunas de A != linhas de B")\n    C = [[0] * p for _ in range(m)]\n    for i in range(m):\n        for j in range(p):\n            for k in range(n):\n                C[i][j] += A[i][k] * B[k][j]\n    return C\n\nA = [[1, 2, 3],\n     [4, 5, 6]]          # 2×3\nB = [[1, 0],\n     [0, 1],\n     [1, 1]]             # 3×2\nprint(multiplica(A, B))  # 2×2', out: '[[4, 5], [10, 11]]' }
+      { warn: '<p>A×B ≠ B×A &nbsp;·&nbsp; (m×<b>n</b>)·(<b>n</b>×p) = m×p</p>' }
     ],
     quiz: [
       { q: 'A é 2×3 e B é 3×4. Qual o tamanho de A×B?', options: ['2×4', '3×3', '4×2', 'Não dá para multiplicar'], answer: 0, explain: '(m×n)·(n×p) = m×p.' },

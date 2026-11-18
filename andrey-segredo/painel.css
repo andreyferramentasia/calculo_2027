@@ -1,0 +1,59 @@
+/* =========================================================
+   PAINEL DO PROFESSOR (andrey-segredo)
+   ========================================================= */
+.prof { max-width: 1100px; margin: 0 auto; padding: 28px 16px 60px; }
+.prof [hidden] { display: none !important; }
+.prof-login { max-width: 420px; display: grid; gap: 12px; }
+
+.prof-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 28px 0 12px; }
+.prof-head h2 { margin: 0; }
+
+.prof-secoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.prof-secao {
+  display: grid;
+  gap: 10px;
+  background: var(--panel);
+  border: var(--bw) dashed var(--ink);
+  border-radius: 16px;
+  padding: 14px;
+}
+.prof-secao div { display: grid; gap: 2px; }
+.prof-secao.on { border-style: solid; background: var(--lime); color: #17171c; box-shadow: var(--shadow-s); }
+.prof-secao.on .muted { color: #2f3a1f; }
+.prof-secao .btn { justify-self: start; }
+
+.prof-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.prof-tools select {
+  font: 700 .95rem var(--font);
+  background: var(--panel);
+  color: var(--text);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.prof-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--panel);
+  border: var(--bw) solid var(--ink);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.prof-table th, .prof-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); }
+.prof-table th { background: var(--acc); color: #17171c; font: 800 .78rem var(--mono); text-transform: uppercase; }
+.prof-table tr:last-child td { border-bottom: 0; }
+.prof-table td.n { font-family: var(--mono); font-weight: 700; }
+.prof-table td.nome { font-weight: 700; }
+.prof-table td.secs { color: var(--muted); font-size: .88rem; }
+.prof-table .warn { color: var(--bad); font-weight: 800; }
+.prof-table tr.podio td.n:first-child { font-size: 1.2rem; }
+.prof-table tr.p1 { background: color-mix(in srgb, var(--acc) 22%, transparent); }
+.prof-vazio { color: var(--faint); text-align: center; padding: 24px !important; }
+.prof-mais { display: block; margin: 14px auto 0; }
+
+@media (max-width: 700px) {
+  .prof-table { display: block; overflow-x: auto; }
+}

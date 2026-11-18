@@ -1,0 +1,61 @@
+<!-- Telas do desafio (js/desafio/desafio.js). Cada <template> é uma tela. -->
+
+<template id="d-offline">
+  <div class="d-card d-center">
+    <span class="d-big-icon">📡</span>
+    <h2>Desafio indisponível</h2>
+    <p class="muted d-off-msg">Este desafio ainda não foi liberado pelo professor.</p>
+  </div>
+</template>
+
+<template id="d-entrada">
+  <form class="d-card d-entrada" autocomplete="off">
+    <span class="d-kicker">DESAFIO DA SEÇÃO</span>
+    <h2 class="d-titulo"></h2>
+    <p class="muted d-info"></p>
+    <label>Nome e sobrenome
+      <input name="nome" type="text" maxlength="80" required autocomplete="off" spellcheck="false" placeholder="Ex.: Maria Souza">
+    </label>
+    <p class="d-erro" role="alert"></p>
+    <button class="btn primary d-go" type="submit">Entrar no desafio →</button>
+    <ul class="d-regras">
+      <li>Cada pergunta tem tempo. Mais rápido = mais pontos.</li>
+      <li>Copiar e colar estão bloqueados.</li>
+      <li>Você só pode participar <b>uma vez</b>.</li>
+    </ul>
+  </form>
+</template>
+
+<template id="d-pergunta">
+  <div class="d-jogo">
+    <div class="d-bar">
+      <span class="d-prog"></span>
+      <span class="d-nome"></span>
+      <span class="d-pts"></span>
+    </div>
+    <div class="d-timer"><i></i><b class="d-seg"></b></div>
+    <div class="d-card d-q">
+      <h2 class="d-qtext"></h2>
+      <pre class="d-code" hidden></pre>
+    </div>
+    <div class="d-opcoes"></div>
+    <div class="d-feedback" hidden>
+      <b class="d-fb-title"></b>
+      <span class="d-fb-pts"></span>
+      <button class="btn d-next" type="button">Próxima →</button>
+    </div>
+  </div>
+</template>
+
+<template id="d-fim">
+  <div class="d-card d-center d-fim">
+    <span class="d-big-icon">🏆</span>
+    <span class="d-kicker">DESAFIO CONCLUÍDO</span>
+    <h2 class="d-fim-nome"></h2>
+    <div class="d-placar">
+      <div><b class="d-fim-acertos"></b><span>acertos</span></div>
+      <div><b class="d-fim-pontos"></b><span>pontos</span></div>
+    </div>
+    <p class="d-salvo muted">Salvando resultado…</p>
+  </div>
+</template>

@@ -99,7 +99,7 @@
 
 /* sintaxe em fundo escuro: painéis de código e tema escuro */
 :root[data-theme="dark"],
-.codeblock, .lab-code, .compare pre, .pycall, .pg-editor, .q .codeblock {
+.codeblock, .lab-code, .compare pre, .pycall, .pg-editor, .q .codeblock, .gab-code {
   --sx-kw: #d6a4ff;
   --sx-str: #b8f28a;
   --sx-num: #ffab76;

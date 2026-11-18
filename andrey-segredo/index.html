@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Painel</title>
+  <link rel="icon" type="image/svg+xml" href="../img/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../calculo/css/base.css">
+  <link rel="stylesheet" href="../calculo/css/components.css">
+  <link rel="stylesheet" href="../calculo/css/lab.css">
+  <link rel="stylesheet" href="../calculo/css/desafio.css">
+  <link rel="stylesheet" href="painel.css">
+</head>
+<body>
+  <main class="prof">
+    <header class="lesson-head">
+      <div class="crumb"><b>Painel do professor</b></div>
+      <h1>🏆 Desafios</h1>
+    </header>
+
+    <!-- login: a senha é conferida no Google, nunca aqui -->
+    <form class="d-card d-entrada prof-login" id="login" autocomplete="off">
+      <label>Senha
+        <input name="senha" type="password" required autocomplete="current-password">
+      </label>
+      <p class="d-erro" role="alert"></p>
+      <button class="btn primary" type="submit">Entrar</button>
+    </form>
+
+    <section id="painel" hidden>
+      <div class="prof-head">
+        <h2>Seções</h2>
+        <button class="btn sm ghost" id="sair" type="button">Sair</button>
+      </div>
+      <div class="prof-secoes" id="secoes"></div>
+
+      <div class="prof-head">
+        <h2>Ranking</h2>
+        <span class="muted" id="info"></span>
+      </div>
+      <div class="prof-tools">
+        <select id="filtro" aria-label="Ranking"></select>
+        <button class="btn primary" id="csv" type="button">⬇ Baixar CSV</button>
+        <button class="btn" id="json" type="button">⬇ JSON</button>
+        <button class="btn sm ghost" id="atualizar" type="button">↻ Atualizar</button>
+      </div>
+      <table class="prof-table">
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <button class="btn prof-mais" id="mais" type="button" hidden>Mostrar mais</button>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="../calculo/js/core/namespace.js"></script>
+  <script>window.ALG.PARTIALS_BASE = '../calculo/partials/';</script>
+  <script src="../calculo/js/core/partials.js"></script>
+  <script src="../calculo/js/core/modal.js"></script>
+  <script src="../calculo/js/desafio/config.js"></script>
+  <script src="../calculo/js/desafio/api.js"></script>
+  <script src="painel.js"></script>
+</body>
+</html>
