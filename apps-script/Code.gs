@@ -78,8 +78,16 @@ function iniciar(d) {
   if (!lock.tryLock(20000)) falha_(503, 'Servidor ocupado.');
   try {
     if (PROPS.getProperty(recKey_(secao, chave))) falha_(409, 'Esse nome já fez este desafio. Fale com o professor.');
+    // sessão antiga do mesmo nome (aluno fechou o navegador): descarta e recomeça do zero
     const dono = CACHE.get(nomeKey_(secao, chave));
-    if (dono && dono !== token) falha_(409, 'Esse nome já está fazendo este desafio agora.');
+    if (dono && dono !== token) {
+      const antiga = lerSessao_(dono);
+      if (antiga && antiga.fim) {
+        if (!antiga.salvo) PROPS.setProperty(recKey_(secao, chave), registro_(dono, antiga));   // terminou mas fechou antes de salvar
+        falha_(409, 'Esse nome já fez este desafio. Fale com o professor.');
+      }
+      CACHE.remove('s:' + dono);
+    }
     CACHE.put(nomeKey_(secao, chave), token, SESSAO_S);
     const s = {
       secao: secao, nome: nome, chave: chave, ordem: embaralha_(QUESTOES[secao].perguntas.length),
@@ -147,10 +155,7 @@ function salvar(d) {
       if (existente) {
         if (JSON.parse(existente).sessao !== sha_(token).slice(0, 16)) falha_(409, 'Esse nome já fez este desafio.');
       } else {
-        PROPS.setProperty(k, JSON.stringify({
-          nome: s.nome, secao: s.secao, acertos: s.acertos, total: s.ordem.length, pontos: s.pontos,
-          saidas: s.saidas, inicio: s.inicio, fim: s.fim, sessao: sha_(token).slice(0, 16)
-        }));
+        PROPS.setProperty(k, registro_(token, s));
       }
     } finally {
       lock.releaseLock();
@@ -279,6 +284,13 @@ function publico_(s) {
     nome: s.nome, titulo: QUESTOES[s.secao].titulo, total: s.ordem.length,
     atual: s.atual, acertos: s.acertos, pontos: s.pontos, fim: !!s.fim, salvo: !!s.salvo
   };
+}
+
+function registro_(token, s) {
+  return JSON.stringify({
+    nome: s.nome, secao: s.secao, acertos: s.acertos, total: s.ordem.length, pontos: s.pontos,
+    saidas: s.saidas, inicio: s.inicio, fim: s.fim, sessao: sha_(token).slice(0, 16)
+  });
 }
 
 function resposta_(s) {

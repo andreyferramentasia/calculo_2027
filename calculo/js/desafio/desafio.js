@@ -19,6 +19,14 @@
     }).catch(function () { return A.liberados; });
   };
 
+  /* sessão do aluno só na aba (sessionStorage): fechou o navegador, zerou */
+  var sessao = {
+    get: function (k) { try { return sessionStorage.getItem('alg:' + k); } catch (e) { return null; } },
+    set: function (k, v) {
+      try { if (v) sessionStorage.setItem('alg:' + k, v); else sessionStorage.removeItem('alg:' + k); } catch (e) { /* sem storage */ }
+    }
+  };
+
   function tela(id) {
     return tpl.querySelector('#' + id).content.firstElementChild.cloneNode(true);
   }
@@ -80,7 +88,7 @@
     (tpl ? Promise.resolve() : A.partial('desafio').then(function (html) { tpl = A.el('div', '', html); }))
       .then(function () {
         if (!A.DESAFIO_API) return offline('Os desafios ainda não foram configurados.');
-        var tok = A.store.get(key, null);
+        var tok = sessao.get(key);
         if (tok) return retoma(tok);
         return A.carregarLiberados().then(function (lib) {
           if (lib.indexOf(id) < 0) return offline();
@@ -105,7 +113,7 @@
         var tok = A.novoToken();
         A.desafioApi('iniciar', { secao: id, nome: nome, token: tok }, { aoRepetir: function () { erro.textContent = 'Muita gente ao mesmo tempo… tentando de novo ⏳'; } })
           .then(function () {
-            A.store.set(key, tok);
+            sessao.set(key, tok);
             proxima(tok);
           })
           .catch(function (err) {
@@ -127,7 +135,7 @@
         if (d.fim) return fim(tok, d);
         pergunta(tok, d);
       }).catch(function (err) {
-        if (err.status === 401) { A.store.set(key, null); A.renderDesafio(view, id); }
+        if (err.status === 401) { sessao.set(key, null); A.renderDesafio(view, id); }
         else erroTela(err);
       });
     }
