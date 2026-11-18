@@ -1,5 +1,6 @@
 /* =========================================================
-   PAINEL DO PROFESSOR — liberar desafios, ranking e CSV
+   PAINEL DO PROFESSOR — por matéria: liberar desafios,
+   ranking (filtro por seção e ano de ingresso), CSV e limpeza.
    A senha é enviada ao Apps Script, que confere lá; aqui só
    fica um token temporário em sessionStorage (some ao fechar).
    ========================================================= */
@@ -9,7 +10,8 @@
   try { tok = sessionStorage.getItem('painel:tok'); } catch (e) { /* sem storage */ }
 
   var login = A.$('#login'), painel = A.$('#painel');
-  var filtro = A.$('#filtro'), thead = A.$('#thead'), tbody = A.$('#tbody'), info = A.$('#info'), mais = A.$('#mais');
+  var selMateria = A.$('#materia'), filtro = A.$('#filtro'), selAno = A.$('#ano');
+  var thead = A.$('#thead'), tbody = A.$('#tbody'), info = A.$('#info'), mais = A.$('#mais');
 
   function api(acao, d) {
     return A.desafioApi(acao, Object.assign({ token: tok }, d || {})).catch(function (e) {
@@ -53,28 +55,56 @@
   function carregar() {
     return api('admin_resultados').then(function (d) {
       dados = d;
+      renderMaterias();
       renderSecoes();
-      renderFiltro();
+      renderFiltros();
       renderRanking();
     }).catch(function (e) { if (e.status !== 401) A.toast(e.message); });
   }
   A.$('#atualizar').onclick = function () { carregar().then(function () { A.toast('Atualizado'); }); };
 
+  /* ---------- matéria ---------- */
+  function materia() {
+    return dados.materias.filter(function (m) { return m.id === selMateria.value; })[0] || dados.materias[0];
+  }
+  function renderMaterias() {
+    var atual = selMateria.value || A.store.get('painel:materia', '');
+    selMateria.innerHTML = '';
+    dados.materias.forEach(function (m) {
+      var n = dados.linhas.filter(function (r) { return r.materia === m.id; }).length;
+      var o = A.el('option'); o.value = m.id;
+      o.textContent = m.titulo + (n ? ' (' + n + ')' : '');
+      selMateria.appendChild(o);
+    });
+    if (atual && dados.materias.some(function (m) { return m.id === atual; })) selMateria.value = atual;
+  }
+  selMateria.onchange = function () {
+    A.store.set('painel:materia', selMateria.value);
+    filtro.value = 'geral';
+    selAno.value = 'todos';
+    mostrarTudo = false;
+    renderSecoes(); renderFiltros(); renderRanking();
+  };
+
   /* ---------- seções: liberar / bloquear ---------- */
   function renderSecoes() {
-    var box = A.$('#secoes');
+    var box = A.$('#secoes'), m = materia();
     box.innerHTML = '';
-    dados.secoes.forEach(function (s) {
-      var n = dados.linhas.filter(function (r) { return r.secao === s.id; }).length;
+    if (!m.secoes.length) {
+      box.innerHTML = '<p class="muted prof-vazio-sec">Nenhuma pergunta cadastrada para esta matéria ainda (adicione em <code>Questoes.gs</code>).</p>';
+      return;
+    }
+    m.secoes.forEach(function (s) {
+      var n = dados.linhas.filter(function (r) { return r.materia === m.id && r.secao === s.id; }).length;
       var c = A.el('div', 'prof-secao' + (s.liberado ? ' on' : ''));
-      c.innerHTML = '<div><b></b><span class="muted">' + n + ' participante' + (n === 1 ? '' : 's') + ' · ' + s.total + ' perguntas</span></div>' +
+      c.innerHTML = '<div><b></b><span class="muted">' + n + ' resultado' + (n === 1 ? '' : 's') + ' · ' + s.total + ' perguntas</span></div>' +
         '<button class="btn sm" type="button"></button>';
       A.$('b', c).textContent = s.titulo;
       var b = A.$('button', c);
       b.textContent = s.liberado ? '🔓 Liberado · bloquear' : '🔒 Bloqueado · liberar';
       b.onclick = function () {
         b.disabled = true;
-        api('admin_liberar', { secao: s.id, liberado: !s.liberado }).then(function () {
+        api('admin_liberar', { materia: m.id, secao: s.id, liberado: !s.liberado }).then(function () {
           A.toast(s.liberado ? 'Desafio bloqueado' : 'Desafio liberado: já aparece no menu dos alunos');
           return carregar();
         }).catch(function (e) { A.toast(e.message); b.disabled = false; });
@@ -83,37 +113,56 @@
     });
   }
 
-  /* ---------- ranking ---------- */
-  function renderFiltro() {
-    var atual = filtro.value || 'geral';
+  /* ---------- filtros do ranking ---------- */
+  function renderFiltros() {
+    var m = materia();
+    var sec = filtro.value || 'geral';
     filtro.innerHTML = '<option value="geral">Geral (soma das seções)</option>';
-    dados.secoes.forEach(function (s) {
+    m.secoes.forEach(function (s) {
       var o = A.el('option'); o.value = s.id; o.textContent = s.titulo; filtro.appendChild(o);
     });
-    filtro.value = atual;
+    filtro.value = m.secoes.some(function (s) { return s.id === sec; }) ? sec : 'geral';
+
+    var ano = selAno.value || 'todos';
+    var anos = {};
+    dados.linhas.forEach(function (r) { if (r.materia === m.id && r.ano) anos[r.ano] = 1; });
+    selAno.innerHTML = '<option value="todos">Todos os anos</option>';
+    Object.keys(anos).sort().reverse().forEach(function (a) {
+      var o = A.el('option'); o.value = a; o.textContent = 'Ingresso ' + a; selAno.appendChild(o);
+    });
+    selAno.value = anos[ano] ? ano : 'todos';
   }
-  filtro.onchange = function () { mostrarTudo = false; renderRanking(); };
+  filtro.onchange = selAno.onchange = function () { mostrarTudo = false; renderRanking(); };
   mais.onclick = function () { mostrarTudo = !mostrarTudo; renderRanking(); };
 
-  function titulo(id) {
-    var s = dados.secoes.filter(function (x) { return x.id === id; })[0];
+  function tituloSecao(id) {
+    var s = materia().secoes.filter(function (x) { return x.id === id; })[0];
     return s ? s.titulo : id;
   }
 
-  /* linhas da visão atual, já ordenadas */
+  /* resultados que batem com matéria + seção + ano */
+  function filtrados() {
+    var m = materia().id, sec = filtro.value, ano = selAno.value;
+    return dados.linhas.filter(function (r) {
+      return r.materia === m && (sec === 'geral' || r.secao === sec) && (ano === 'todos' || String(r.ano) === ano);
+    });
+  }
+
+  /* linhas da visão atual, já ordenadas (geral = soma por aluno + ano) */
   function linhas() {
+    var F = filtrados();
     if (filtro.value === 'geral') {
       var por = {};
-      dados.linhas.forEach(function (r) {
-        var g = por[r.chave] || (por[r.chave] = { nome: r.nome, pontos: 0, acertos: 0, total: 0, saidas: 0, secoes: [] });
+      F.forEach(function (r) {
+        var k = r.ano + '|' + r.chave;
+        var g = por[k] || (por[k] = { nome: r.nome, ano: r.ano, pontos: 0, acertos: 0, total: 0, saidas: 0, secoes: [] });
         g.pontos += r.pontos; g.acertos += r.acertos; g.total += r.total; g.saidas += r.saidas;
-        g.secoes.push(titulo(r.secao));
+        g.secoes.push(tituloSecao(r.secao));
       });
       return Object.keys(por).map(function (k) { por[k].secoes.sort(); return por[k]; })
         .sort(function (a, b) { return b.pontos - a.pontos || b.acertos - a.acertos || a.nome.localeCompare(b.nome); });
     }
-    return dados.linhas.filter(function (r) { return r.secao === filtro.value; })
-      .sort(function (a, b) { return b.pontos - a.pontos || b.acertos - a.acertos || a.fim - b.fim; });
+    return F.sort(function (a, b) { return b.pontos - a.pontos || b.acertos - a.acertos || a.fim - b.fim; });
   }
 
   function hora(t) { return t ? new Date(t).toLocaleString('pt-BR') : ''; }
@@ -123,14 +172,14 @@
     var L = linhas();
     var vis = mostrarTudo ? L : L.slice(0, TOP);
     thead.innerHTML = geral
-      ? '<tr><th>#</th><th>Nome</th><th>Pontos</th><th>Acertos</th><th>Seções</th><th>Saiu da tela</th></tr>'
-      : '<tr><th>#</th><th>Nome</th><th>Pontos</th><th>Acertos</th><th>Terminou</th><th>Saiu da tela</th><th></th></tr>';
+      ? '<tr><th>#</th><th>Nome</th><th>Ingresso</th><th>Pontos</th><th>Acertos</th><th>Seções</th><th>Saiu da tela</th></tr>'
+      : '<tr><th>#</th><th>Nome</th><th>Ingresso</th><th>Pontos</th><th>Acertos</th><th>Terminou</th><th>Saiu da tela</th><th></th></tr>';
     tbody.innerHTML = '';
-    if (!L.length) tbody.innerHTML = '<tr><td colspan="7" class="prof-vazio">Ninguém terminou ainda.</td></tr>';
+    if (!L.length) tbody.innerHTML = '<tr><td colspan="8" class="prof-vazio">Nenhum resultado com este filtro.</td></tr>';
     vis.forEach(function (r, i) {
       var tr = A.el('tr', i < 3 ? 'podio p' + (i + 1) : '');
       var medalha = ['🥇', '🥈', '🥉'][i] || (i + 1);
-      tr.innerHTML = '<td class="n">' + medalha + '</td><td class="nome"></td><td class="n">' + r.pontos + '</td><td class="n">' + r.acertos + '/' + r.total + '</td>' +
+      tr.innerHTML = '<td class="n">' + medalha + '</td><td class="nome"></td><td class="n">' + A.esc(r.ano || '—') + '</td><td class="n">' + r.pontos + '</td><td class="n">' + r.acertos + '/' + r.total + '</td>' +
         (geral ? '<td class="secs"></td>' : '<td>' + hora(r.fim) + '</td>') +
         '<td class="n' + (r.saidas ? ' warn' : '') + '">' + r.saidas + '</td>' +
         (geral ? '' : '<td><button class="btn sm ghost" type="button">Apagar</button></td>');
@@ -141,21 +190,44 @@
     });
     mais.hidden = L.length <= TOP;
     mais.textContent = mostrarTudo ? 'Mostrar só os ' + TOP + ' primeiros' : 'Mostrar mais (' + (L.length - TOP) + ')';
-    var n = dados.linhas.length;
-    info.textContent = n + ' resultado' + (n === 1 ? '' : 's') + ' salvos · atualiza a cada 20 s';
+    var n = filtrados().length;
+    info.textContent = n + ' resultado' + (n === 1 ? '' : 's') + ' neste filtro · atualiza a cada 20 s';
+    A.$('#limpar').disabled = !n;
   }
 
   function apagar(r) {
     A.confirm({
       icon: '🗑', danger: true, title: 'Apagar ' + r.nome + '?',
-      msg: 'Remove o resultado em <b>' + A.esc(titulo(r.secao)) + '</b>. O aluno poderá fazer este desafio de novo.',
+      msg: 'Remove o resultado em <b>' + A.esc(tituloSecao(r.secao)) + '</b>. O aluno poderá fazer este desafio de novo.',
       ok: 'Apagar', cancel: 'Cancelar'
     }).then(function (sim) {
       if (!sim) return;
-      api('admin_apagar', { secao: r.secao, nome: r.nome }).then(function () { A.toast('Apagado'); carregar(); })
+      api('admin_apagar', { materia: r.materia, secao: r.secao, ano: r.ano, nome: r.nome })
+        .then(function () { A.toast('Apagado'); carregar(); })
         .catch(function (e) { A.toast(e.message); });
     });
   }
+
+  /* ---------- limpar tudo do filtro atual ---------- */
+  A.$('#limpar').onclick = function () {
+    var n = filtrados().length;
+    if (!n) return;
+    var m = materia();
+    var alvo = '<b>' + A.esc(m.titulo) + '</b> · ' +
+      (filtro.value === 'geral' ? 'todas as seções' : '<b>' + A.esc(tituloSecao(filtro.value)) + '</b>') + ' · ' +
+      (selAno.value === 'todos' ? 'todos os anos' : 'ingresso <b>' + A.esc(selAno.value) + '</b>');
+    A.confirm({
+      icon: '🗑', danger: true,
+      title: 'Zerar ' + n + ' resultado' + (n === 1 ? '' : 's') + '?',
+      msg: alvo + '<br><br>Isso <b>não pode ser desfeito</b>. Baixe o CSV antes, se precisar.',
+      ok: 'Sim, apagar tudo', cancel: 'Cancelar'
+    }).then(function (sim) {
+      if (!sim) return;
+      api('admin_limpar', { materia: m.id, secao: filtro.value, ano: selAno.value })
+        .then(function (d) { A.toast(d.apagados + ' resultado(s) apagados'); mostrarTudo = false; carregar(); })
+        .catch(function (e) { A.toast(e.message); });
+    });
+  };
 
   /* ---------- exportar ---------- */
   function baixar(nome, conteudo, tipo) {
@@ -170,20 +242,23 @@
     if (/^[=+\-@]/.test(v)) v = "'" + v;                       // evita fórmula no Excel
     return /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
   }
+  function nomeArquivo(ext) {
+    return ['ranking', materia().id, filtro.value, selAno.value === 'todos' ? 'todos-anos' : selAno.value].join('_') + '.' + ext;
+  }
   A.$('#csv').onclick = function () {
     if (!dados) return;
     var geral = filtro.value === 'geral';
-    var rows = [geral ? ['posicao', 'nome', 'pontos', 'acertos', 'total', 'secoes', 'saiu_da_tela']
-                      : ['posicao', 'nome', 'pontos', 'acertos', 'total', 'inicio', 'fim', 'saiu_da_tela']];
+    var rows = [geral ? ['posicao', 'nome', 'ano_ingresso', 'pontos', 'acertos', 'total', 'secoes', 'saiu_da_tela']
+                      : ['posicao', 'nome', 'ano_ingresso', 'pontos', 'acertos', 'total', 'inicio', 'fim', 'saiu_da_tela']];
     linhas().forEach(function (r, i) {
-      rows.push(geral ? [i + 1, r.nome, r.pontos, r.acertos, r.total, r.secoes.join(' | '), r.saidas]
-                      : [i + 1, r.nome, r.pontos, r.acertos, r.total, hora(r.inicio), hora(r.fim), r.saidas]);
+      rows.push(geral ? [i + 1, r.nome, r.ano, r.pontos, r.acertos, r.total, r.secoes.join(' | '), r.saidas]
+                      : [i + 1, r.nome, r.ano, r.pontos, r.acertos, r.total, hora(r.inicio), hora(r.fim), r.saidas]);
     });
     var csv = '﻿' + rows.map(function (l) { return l.map(cel).join(';'); }).join('\r\n');
-    baixar('ranking_' + filtro.value + '.csv', csv, 'text/csv;charset=utf-8');
+    baixar(nomeArquivo('csv'), csv, 'text/csv;charset=utf-8');
   };
   A.$('#json').onclick = function () {
-    if (dados) baixar('resultados.json', JSON.stringify(dados.linhas, null, 2), 'application/json');
+    if (dados) baixar(nomeArquivo('json'), JSON.stringify(filtrados(), null, 2), 'application/json');
   };
 
   document.documentElement.setAttribute('data-theme', A.store.get('tema', 'light'));

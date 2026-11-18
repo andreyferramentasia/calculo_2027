@@ -13,7 +13,7 @@
   /* ---------- quais desafios estão liberados (para o menu) ---------- */
   A.carregarLiberados = function () {
     if (!A.DESAFIO_API) return Promise.resolve([]);
-    return A.desafioApi('liberados', {}, {}).then(function (d) {
+    return A.desafioApi('liberados', { materia: A.MATERIA }, {}).then(function (d) {
       A.liberados = d.liberados.map(function (x) { return x.id; });
       return A.liberados;
     }).catch(function () { return A.liberados; });
@@ -105,13 +105,21 @@
       A.$('.d-titulo', f).textContent = mod.title;
       A.$('.d-info', f).textContent = 'Responda às perguntas sobre as aulas de ' + mod.title.toLowerCase() + '.';
       var erro = A.$('.d-erro', f), go = A.$('.d-go', f);
+      var ano = new Date().getFullYear() + 1;
+      for (var y = ano; y >= ano - 10; y--) {
+        var o = A.el('option'); o.value = y; o.textContent = y; f.ano.appendChild(o);
+      }
+      var anoSalvo = A.store.get('desafio:ano', '');
+      if (anoSalvo) f.ano.value = anoSalvo;
       f.onsubmit = function (e) {
         e.preventDefault();
         var nome = f.nome.value.trim().replace(/\s+/g, ' ');
         if (nome.split(' ').length < 2) { erro.textContent = 'Digite nome e sobrenome.'; return; }
+        if (!f.ano.value) { erro.textContent = 'Escolha o ano de ingresso.'; return; }
+        A.store.set('desafio:ano', f.ano.value);
         go.disabled = true; erro.textContent = '';
         var tok = A.novoToken();
-        A.desafioApi('iniciar', { secao: id, nome: nome, token: tok }, { aoRepetir: function () { erro.textContent = 'Muita gente ao mesmo tempo… tentando de novo ⏳'; } })
+        A.desafioApi('iniciar', { materia: A.MATERIA, secao: id, nome: nome, ano: Number(f.ano.value), token: tok }, { aoRepetir: function () { erro.textContent = 'Muita gente ao mesmo tempo… tentando de novo ⏳'; } })
           .then(function () {
             sessao.set(key, tok);
             proxima(tok);

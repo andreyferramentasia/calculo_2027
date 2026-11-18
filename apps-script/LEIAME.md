@@ -23,8 +23,13 @@ Versão: Nova versão → Implantar**. A URL continua a mesma.
 - Painel: `https://<seu-usuario>.github.io/calculo_2027/andrey-segredo/`
 - Libere uma seção → ela aparece no menu dos alunos (em até 1 min, ou ao recarregar).
 
+## Matérias e perguntas
+`Questoes.gs` → `QUESTOES[<matéria>].secoes[<seção>]`. O id da matéria é o mesmo de
+`js/hub.js` e de `MATERIA` em `<matéria>/js/desafio/config.js`.
+
 ## Onde ficam os dados
-Propriedades do script (JSON): `liberados` e uma chave `r|<seção>|<nome>` por resultado.
+Propriedades do script (JSON): `liberados` (por matéria) e uma chave
+`r|<matéria>|<seção>|<ano>|<nome>` por resultado.
 Limite do Google: ~500 KB no total (≈ 3.000 resultados). Exporte o CSV/JSON pelo painel.
 
 ⚠ `Questoes.gs` **não vai para o git** (tem as respostas). Guarde uma cópia.

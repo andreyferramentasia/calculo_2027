@@ -4,12 +4,13 @@
  *
  * Segredos ficam SÓ aqui no Google (nunca no site / F12):
  *   - Propriedade do script SENHA_PROFESSOR  (senha da página secreta)
- *   - Questoes.gs                             (perguntas + respostas)
+ *   - Questoes.gs                             (matérias, seções, perguntas + respostas)
  *
  * Dados (JSON nas Propriedades do script):
- *   liberados               ["fundamentos", ...]
- *   r|<secao>|<nome-chave>  {nome, secao, acertos, total, pontos, ...}
- * Sessões em andamento ficam no Cache (até 6 h).
+ *   liberados                              {"calculo": ["fundamentos", ...], ...}
+ *   r|<materia>|<secao>|<ano>|<nome-chave> {nome, ano, materia, secao, acertos, total, pontos, ...}
+ * Sessões em andamento ficam no Cache (até 6 h); o aluno que fecha o
+ * navegador recomeça do zero.
  *
  * Fila: toda escrita compartilhada usa LockService (um por vez).
  * Se a fila demorar, devolve status 503 e o site tenta de novo sozinho.
@@ -41,7 +42,8 @@ function doPost(e) {
     admin_estado: admin_(adminEstado),
     admin_liberar: admin_(adminLiberar),
     admin_resultados: admin_(adminResultados),
-    admin_apagar: admin_(adminApagar)
+    admin_apagar: admin_(adminApagar),
+    admin_limpar: admin_(adminLimpar)
   };
   const fn = rotas[String(d.acao || '')];
   if (!fn) return json_({ erro: 'Ação inexistente.', status: 404 });
@@ -55,42 +57,50 @@ function doPost(e) {
 
 /* ======================= aluno ======================= */
 
-function liberados() {
+function liberados(d) {
+  const materia = String(d.materia || '');
   return {
-    liberados: liberadosLista_().map(function (id) {
-      return { id: id, titulo: QUESTOES[id].titulo, total: QUESTOES[id].perguntas.length };
+    liberados: liberadosDe_(materia).map(function (id) {
+      const s = secao_(materia, id);
+      return { id: id, titulo: s.titulo, total: s.perguntas.length };
     })
   };
 }
 
 function iniciar(d) {
+  const materia = String(d.materia || '');
   const secao = String(d.secao || '');
-  if (!QUESTOES[secao] || liberadosLista_().indexOf(secao) < 0) falha_(403, 'Este desafio não está liberado.');
+  if (!secao_(materia, secao) || liberadosDe_(materia).indexOf(secao) < 0) falha_(403, 'Este desafio não está liberado.');
   const token = tokenValido_(d.token);
   const ja = lerSessao_(token);
-  if (ja) return publico_(ja);                       // retomada ou repetição do pedido
+  if (ja) return publico_(ja);                       // repetição do pedido
 
   const nome = nomeValido_(d.nome);
   if (!nome) falha_(400, 'Digite nome e sobrenome (só letras).');
+  const ano = anoValido_(d.ano);
+  if (!ano) falha_(400, 'Escolha o ano de ingresso.');
   const chave = chaveNome_(nome);
+  const rk = recKey_(materia, secao, ano, chave);
+  const nk = 'n:' + rk;
 
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(20000)) falha_(503, 'Servidor ocupado.');
   try {
-    if (PROPS.getProperty(recKey_(secao, chave))) falha_(409, 'Esse nome já fez este desafio. Fale com o professor.');
-    // sessão antiga do mesmo nome (aluno fechou o navegador): descarta e recomeça do zero
-    const dono = CACHE.get(nomeKey_(secao, chave));
+    if (PROPS.getProperty(rk)) falha_(409, 'Esse nome já fez este desafio. Fale com o professor.');
+    // sessão antiga do mesmo aluno (fechou o navegador): descarta e recomeça do zero
+    const dono = CACHE.get(nk);
     if (dono && dono !== token) {
       const antiga = lerSessao_(dono);
       if (antiga && antiga.fim) {
-        if (!antiga.salvo) PROPS.setProperty(recKey_(secao, chave), registro_(dono, antiga));   // terminou mas fechou antes de salvar
+        if (!antiga.salvo) PROPS.setProperty(rk, registro_(dono, antiga));   // terminou mas fechou antes de salvar
         falha_(409, 'Esse nome já fez este desafio. Fale com o professor.');
       }
       CACHE.remove('s:' + dono);
     }
-    CACHE.put(nomeKey_(secao, chave), token, SESSAO_S);
+    CACHE.put(nk, token, SESSAO_S);
     const s = {
-      secao: secao, nome: nome, chave: chave, ordem: embaralha_(QUESTOES[secao].perguntas.length),
+      materia: materia, secao: secao, ano: ano, nome: nome, chave: chave,
+      ordem: embaralha_(secao_(materia, secao).perguntas.length),
       atual: 0, servido: null, acertos: 0, pontos: 0, saidas: 0,
       inicio: Date.now(), fim: null, ultimo: null, salvo: false
     };
@@ -104,7 +114,7 @@ function iniciar(d) {
 function pergunta(d) {
   const token = tokenValido_(d.token);
   const s = sessao_(token);
-  const q = QUESTOES[s.secao];
+  const q = secao_(s.materia, s.secao);
   const total = s.ordem.length;
   saidas_(s, d.saidas);
   if (s.atual < total && s.servido) {                // pergunta abandonada: conta como errada
@@ -134,7 +144,7 @@ function responder(d) {
   if (s.ultimo && s.ultimo.i === i && s.atual === i + 1) return resposta_(s);   // repetição: mesma resposta
   if (i !== s.atual || !s.servido || s.atual >= s.ordem.length) falha_(409, 'Pergunta já respondida.');
   saidas_(s, d.saidas);
-  const p = QUESTOES[s.secao].perguntas[s.ordem[s.atual]];
+  const p = secao_(s.materia, s.secao).perguntas[s.ordem[s.atual]];
   const escolha = Number.isInteger(d.escolha) ? d.escolha : -1;
   registra_(s, p, escolha, Date.now() - s.servido);
   gravarSessao_(token, s);
@@ -150,7 +160,7 @@ function salvar(d) {
     const lock = LockService.getScriptLock();
     if (!lock.tryLock(25000)) falha_(503, 'Servidor ocupado.');
     try {
-      const k = recKey_(s.secao, s.chave);
+      const k = recKey_(s.materia, s.secao, s.ano, s.chave);
       const existente = PROPS.getProperty(k);
       if (existente) {
         if (JSON.parse(existente).sessao !== sha_(token).slice(0, 16)) falha_(409, 'Esse nome já fez este desafio.');
@@ -188,22 +198,32 @@ function admin_(fn) {
 }
 
 function adminEstado() {
-  const lib = liberadosLista_();
+  const lib = liberadosMapa_();
   return {
-    secoes: Object.keys(QUESTOES).map(function (id) {
-      return { id: id, titulo: QUESTOES[id].titulo, total: QUESTOES[id].perguntas.length, liberado: lib.indexOf(id) >= 0 };
+    materias: Object.keys(QUESTOES).map(function (m) {
+      const secs = QUESTOES[m].secoes || {};
+      return {
+        id: m,
+        titulo: QUESTOES[m].titulo,
+        secoes: Object.keys(secs).map(function (id) {
+          return { id: id, titulo: secs[id].titulo, total: secs[id].perguntas.length, liberado: (lib[m] || []).indexOf(id) >= 0 };
+        })
+      };
     })
   };
 }
 
 function adminLiberar(d) {
+  const materia = String(d.materia || '');
   const secao = String(d.secao || '');
-  if (!QUESTOES[secao]) falha_(404, 'Seção inexistente.');
+  if (!secao_(materia, secao)) falha_(404, 'Seção inexistente.');
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(20000)) falha_(503, 'Servidor ocupado.');
   try {
-    const lib = liberadosLista_().filter(function (x) { return x !== secao; });
-    if (d.liberado) lib.push(secao);
+    const lib = liberadosMapa_();
+    const lista = (lib[materia] || []).filter(function (x) { return x !== secao; });
+    if (d.liberado) lista.push(secao);
+    lib[materia] = lista;
     PROPS.setProperty('liberados', JSON.stringify(lib));
   } finally {
     lock.releaseLock();
@@ -212,30 +232,47 @@ function adminLiberar(d) {
 }
 
 function adminResultados() {
-  const todos = PROPS.getProperties();
-  const linhas = [];
-  Object.keys(todos).forEach(function (k) {
-    if (k.indexOf('r|') !== 0) return;
-    const r = JSON.parse(todos[k]);
-    delete r.sessao;
-    r.chave = k.split('|')[2];
-    linhas.push(r);
-  });
-  return { linhas: linhas, secoes: adminEstado().secoes };
+  const linhas = registros_().map(function (x) { return x.r; });
+  return Object.assign({ linhas: linhas }, adminEstado());
 }
 
 function adminApagar(d) {
-  const secao = String(d.secao || '');
-  const chave = chaveNome_(String(d.nome || ''));
+  const k = recKey_(String(d.materia || ''), String(d.secao || ''), String(d.ano || ''), chaveNome_(String(d.nome || '')));
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(20000)) falha_(503, 'Servidor ocupado.');
   try {
-    PROPS.deleteProperty(recKey_(secao, chave));
-    CACHE.remove(nomeKey_(secao, chave));
+    PROPS.deleteProperty(k);
+    CACHE.remove('n:' + k);
   } finally {
     lock.releaseLock();
   }
   return { ok: true };
+}
+
+/* apaga todos os resultados que batem com o filtro do painel
+   { materia (obrigatório), secao: 'geral' | id, ano: 'todos' | 2026 } */
+function adminLimpar(d) {
+  const materia = String(d.materia || '');
+  if (!QUESTOES[materia]) falha_(404, 'Matéria inexistente.');
+  const secao = String(d.secao || 'geral');
+  const ano = String(d.ano || 'todos');
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(25000)) falha_(503, 'Servidor ocupado.');
+  let n = 0;
+  try {
+    registros_().forEach(function (x) {
+      const r = x.r;
+      if (r.materia !== materia) return;
+      if (secao !== 'geral' && r.secao !== secao) return;
+      if (ano !== 'todos' && String(r.ano) !== ano) return;
+      PROPS.deleteProperty(x.k);
+      CACHE.remove('n:' + x.k);
+      n++;
+    });
+  } finally {
+    lock.releaseLock();
+  }
+  return { apagados: n };
 }
 
 /* ======================= utilitários ======================= */
@@ -250,12 +287,38 @@ function falha_(status, msg) {
   throw e;
 }
 
-function liberadosLista_() {
+function secao_(materia, secao) {
+  const m = QUESTOES[materia];
+  return m && m.secoes && Object.prototype.hasOwnProperty.call(m.secoes, secao) ? m.secoes[secao] : null;
+}
+
+function liberadosMapa_() {
   try {
-    return JSON.parse(PROPS.getProperty('liberados') || '[]').filter(function (id) { return QUESTOES[id]; });
+    const v = JSON.parse(PROPS.getProperty('liberados') || '{}');
+    return Array.isArray(v) ? { calculo: v } : v;      // formato antigo (só cálculo)
   } catch (e) {
-    return [];
+    return {};
   }
+}
+
+function liberadosDe_(materia) {
+  return (liberadosMapa_()[materia] || []).filter(function (id) { return secao_(materia, id); });
+}
+
+/* todos os resultados salvos: [{k, r}] (aceita chaves do formato antigo r|secao|nome) */
+function registros_() {
+  const todos = PROPS.getProperties();
+  const out = [];
+  Object.keys(todos).forEach(function (k) {
+    if (k.indexOf('r|') !== 0) return;
+    const p = k.split('|');
+    const r = JSON.parse(todos[k]);
+    delete r.sessao;
+    if (p.length === 3) { r.materia = r.materia || 'calculo'; r.ano = r.ano || ''; }
+    r.chave = p[p.length - 1];
+    out.push({ k: k, r: r });
+  });
+  return out;
 }
 
 function tokenValido_(t) {
@@ -281,14 +344,15 @@ function gravarSessao_(token, s) {
 
 function publico_(s) {
   return {
-    nome: s.nome, titulo: QUESTOES[s.secao].titulo, total: s.ordem.length,
+    nome: s.nome, ano: s.ano, titulo: secao_(s.materia, s.secao).titulo, total: s.ordem.length,
     atual: s.atual, acertos: s.acertos, pontos: s.pontos, fim: !!s.fim, salvo: !!s.salvo
   };
 }
 
 function registro_(token, s) {
   return JSON.stringify({
-    nome: s.nome, secao: s.secao, acertos: s.acertos, total: s.ordem.length, pontos: s.pontos,
+    nome: s.nome, ano: s.ano, materia: s.materia, secao: s.secao,
+    acertos: s.acertos, total: s.ordem.length, pontos: s.pontos,
     saidas: s.saidas, inicio: s.inicio, fim: s.fim, sessao: sha_(token).slice(0, 16)
   });
 }
@@ -315,6 +379,12 @@ function saidas_(s, v) {
   if (n > s.saidas && n < 1000) s.saidas = n;
 }
 
+function anoValido_(v) {
+  const a = parseInt(v, 10);
+  const max = new Date().getFullYear() + 1;
+  return a >= 2000 && a <= max ? a : null;
+}
+
 function nomeValido_(nome) {
   nome = String(nome || '').replace(/\s+/g, ' ').trim();
   const partes = nome.split(' ');
@@ -332,8 +402,7 @@ function chaveNome_(nome) {
     .toLowerCase().replace(/[^a-z' -]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-function recKey_(secao, chave) { return 'r|' + secao + '|' + chave; }
-function nomeKey_(secao, chave) { return 'n:' + secao + ':' + chave; }
+function recKey_(materia, secao, ano, chave) { return 'r|' + materia + '|' + secao + '|' + ano + '|' + chave; }
 
 function embaralha_(n) {
   const a = [];

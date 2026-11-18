@@ -23,7 +23,8 @@
 .prof-secao .btn { justify-self: start; }
 
 .prof-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
-.prof-tools select {
+.prof-tools select,
+.prof-materia select {
   font: 700 .95rem var(--font);
   background: var(--panel);
   color: var(--text);
@@ -72,3 +73,12 @@
   width: 100%;
   margin: 0 auto 22px;
 }
+
+/* matéria + limpar */
+.prof-h2 { margin: 26px 0 12px; }
+.prof-head .prof-h2 { margin: 0; }
+.prof-materia { display: flex; align-items: center; gap: 10px; font: 800 1.1rem var(--display); }
+.prof-materia select { font-size: 1rem; min-width: 260px; }
+.prof-limpar { margin-left: auto; background: var(--pink); color: #17171c; }
+.prof-limpar:disabled { opacity: .45; cursor: default; }
+.prof-vazio-sec { grid-column: 1 / -1; margin: 0; }

@@ -5,3 +5,4 @@
    ========================================================= */
 window.ALG = window.ALG || {};
 window.ALG.DESAFIO_API = 'https://script.google.com/macros/s/AKfycbychGXpHC5ae9ERD7tLfCFazXMpnw2Qs-ChnW8gq9YrUUbNlyf_ENxN6ANzn3ziVaMeBw/exec';
+window.ALG.MATERIA = 'calculo';   // id desta matéria (mesmo de js/hub.js e de Questoes.gs)

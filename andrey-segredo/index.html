@@ -33,20 +33,26 @@
 
     <section id="painel" hidden>
       <div class="prof-head">
-        <h2>Seções</h2>
+        <label class="prof-materia">Matéria
+          <select id="materia" aria-label="Matéria"></select>
+        </label>
         <button class="btn sm ghost" id="sair" type="button">Sair</button>
       </div>
+
+      <h2 class="prof-h2">Seções</h2>
       <div class="prof-secoes" id="secoes"></div>
 
       <div class="prof-head">
-        <h2>Ranking</h2>
+        <h2 class="prof-h2">Ranking</h2>
         <span class="muted" id="info"></span>
       </div>
       <div class="prof-tools">
-        <select id="filtro" aria-label="Ranking"></select>
+        <select id="filtro" aria-label="Seção"></select>
+        <select id="ano" aria-label="Ano de ingresso"></select>
         <button class="btn primary" id="csv" type="button">⬇ Baixar CSV</button>
         <button class="btn" id="json" type="button">⬇ JSON</button>
         <button class="btn sm ghost" id="atualizar" type="button">↻ Atualizar</button>
+        <button class="btn sm prof-limpar" id="limpar" type="button">🗑 Limpar ranking filtrado</button>
       </div>
       <table class="prof-table">
         <thead id="thead"></thead>
