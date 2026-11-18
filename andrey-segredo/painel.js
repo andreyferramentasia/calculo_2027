@@ -172,18 +172,29 @@
     return F.sort(function (a, b) { return b.pontos - a.pontos || b.acertos - a.acertos || a.fim - b.fim; });
   }
 
+  /* busca por nome (ignora acentos e maiúsculas) */
+  var busca = A.$('#busca');
+  function normaliza(t) {
+    return String(t || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+  busca.addEventListener('input', function () { if (dados) renderRanking(); });
+
   function hora(t) { return t ? new Date(t).toLocaleString('pt-BR') : ''; }
 
   function renderRanking() {
     var geral = filtro.value === 'geral';
-    var L = linhas();
-    var vis = mostrarTudo ? L : L.slice(0, TOP);
+    var termo = normaliza(busca.value);
+    // posição real no ranking é guardada antes de filtrar pela busca
+    var L = linhas().map(function (r, i) { r.pos = i; return r; })
+      .filter(function (r) { return !termo || normaliza(r.nome).indexOf(termo) >= 0; });
+    var vis = mostrarTudo || termo ? L : L.slice(0, TOP);
     thead.innerHTML = geral
       ? '<tr><th>#</th><th>Nome</th><th>Ingresso</th><th>Pontos</th><th>Acertos</th><th>Seções</th><th>Saiu da tela</th><th></th></tr>'
       : '<tr><th>#</th><th>Nome</th><th>Ingresso</th><th>Pontos</th><th>Acertos</th><th>Terminou</th><th>Saiu da tela</th><th></th></tr>';
     tbody.innerHTML = '';
-    if (!L.length) tbody.innerHTML = '<tr><td colspan="8" class="prof-vazio">Nenhum resultado com este filtro.</td></tr>';
-    vis.forEach(function (r, i) {
+    if (!L.length) tbody.innerHTML = '<tr><td colspan="8" class="prof-vazio">' + (termo ? 'Nenhum aluno com esse nome.' : 'Nenhum resultado com este filtro.') + '</td></tr>';
+    vis.forEach(function (r) {
+      var i = r.pos;
       var tr = A.el('tr', i < 3 ? 'podio p' + (i + 1) : '');
       var medalha = ['🥇', '🥈', '🥉'][i] || (i + 1);
       tr.innerHTML = '<td class="n">' + medalha + '</td><td class="nome"></td><td class="n">' + A.esc(r.ano || '—') + '</td><td class="n">' + r.pontos + '</td><td class="n">' + r.acertos + '/' + r.total + '</td>' +
@@ -195,7 +206,7 @@
       A.$('button', tr).onclick = function () { apagar(r, geral); };
       tbody.appendChild(tr);
     });
-    mais.hidden = L.length <= TOP;
+    mais.hidden = !!termo || L.length <= TOP;
     mais.textContent = mostrarTudo ? 'Mostrar só os ' + TOP + ' primeiros' : 'Mostrar mais (' + (L.length - TOP) + ')';
     var n = filtrados().length;
     info.textContent = n + ' resultado' + (n === 1 ? '' : 's') + ' neste filtro · atualiza a cada 20 s';

@@ -428,7 +428,7 @@ function nomeValido_(nome) {
 }
 
 function chaveNome_(nome) {
-  return String(nome).normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return String(nome).normalize('NFD').replace(/\p{M}/gu, '')
     .toLowerCase().replace(/[^a-z' -]/g, '').replace(/\s+/g, ' ').trim();
 }
 

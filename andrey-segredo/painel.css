@@ -94,3 +94,17 @@
   color: #17171c;
   font-weight: 600;
 }
+
+.prof-busca input {
+  font: 600 .95rem var(--font);
+  background: var(--panel);
+  color: var(--text);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 8px 12px;
+  min-width: 220px;
+  outline: none;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.prof-busca input:focus { box-shadow: 3px 3px 0 var(--hard); }
