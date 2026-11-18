@@ -82,3 +82,15 @@
 .prof-limpar { margin-left: auto; background: var(--pink); color: #17171c; }
 .prof-limpar:disabled { opacity: .45; cursor: default; }
 .prof-vazio-sec { grid-column: 1 / -1; margin: 0; }
+
+.prof-campo { display: grid; gap: 4px; font: 800 .72rem var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.prof-tools { align-items: flex-end; }
+.prof-aviso {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: #ffe08a;
+  color: #17171c;
+  font-weight: 600;
+}

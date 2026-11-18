@@ -39,6 +39,7 @@
         <button class="btn sm ghost" id="sair" type="button">Sair</button>
       </div>
 
+      <div class="prof-aviso" id="aviso" hidden></div>
       <h2 class="prof-h2">Seções</h2>
       <div class="prof-secoes" id="secoes"></div>
 
@@ -47,12 +48,16 @@
         <span class="muted" id="info"></span>
       </div>
       <div class="prof-tools">
-        <select id="filtro" aria-label="Seção"></select>
-        <select id="ano" aria-label="Ano de ingresso"></select>
+        <label class="prof-campo">Seção
+          <select id="filtro"></select>
+        </label>
+        <label class="prof-campo">Ano de ingresso
+          <select id="ano"></select>
+        </label>
         <button class="btn primary" id="csv" type="button">⬇ Baixar CSV</button>
         <button class="btn" id="json" type="button">⬇ JSON</button>
         <button class="btn sm ghost" id="atualizar" type="button">↻ Atualizar</button>
-        <button class="btn sm prof-limpar" id="limpar" type="button">🗑 Limpar ranking filtrado</button>
+        <button class="btn sm prof-limpar" id="limpar" type="button">🗑 Limpar</button>
       </div>
       <table class="prof-table">
         <thead id="thead"></thead>

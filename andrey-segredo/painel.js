@@ -54,6 +54,13 @@
 
   function carregar() {
     return api('admin_resultados').then(function (d) {
+      var aviso = A.$('#aviso');
+      if (!d.materias) {                       // Code.gs antigo publicado no Google
+        aviso.hidden = false;
+        aviso.innerHTML = '⚠ O script no Google está desatualizado. Cole o <code>Code.gs</code> e o <code>Questoes.gs</code> novos e publique uma <b>Nova versão</b> (Implantar → Gerenciar implantações).';
+        return;
+      }
+      aviso.hidden = true;
       dados = d;
       renderMaterias();
       renderSecoes();
@@ -172,7 +179,7 @@
     var L = linhas();
     var vis = mostrarTudo ? L : L.slice(0, TOP);
     thead.innerHTML = geral
-      ? '<tr><th>#</th><th>Nome</th><th>Ingresso</th><th>Pontos</th><th>Acertos</th><th>Seções</th><th>Saiu da tela</th></tr>'
+      ? '<tr><th>#</th><th>Nome</th><th>Ingresso</th><th>Pontos</th><th>Acertos</th><th>Seções</th><th>Saiu da tela</th><th></th></tr>'
       : '<tr><th>#</th><th>Nome</th><th>Ingresso</th><th>Pontos</th><th>Acertos</th><th>Terminou</th><th>Saiu da tela</th><th></th></tr>';
     tbody.innerHTML = '';
     if (!L.length) tbody.innerHTML = '<tr><td colspan="8" class="prof-vazio">Nenhum resultado com este filtro.</td></tr>';
@@ -182,27 +189,34 @@
       tr.innerHTML = '<td class="n">' + medalha + '</td><td class="nome"></td><td class="n">' + A.esc(r.ano || '—') + '</td><td class="n">' + r.pontos + '</td><td class="n">' + r.acertos + '/' + r.total + '</td>' +
         (geral ? '<td class="secs"></td>' : '<td>' + hora(r.fim) + '</td>') +
         '<td class="n' + (r.saidas ? ' warn' : '') + '">' + r.saidas + '</td>' +
-        (geral ? '' : '<td><button class="btn sm ghost" type="button">Apagar</button></td>');
+        '<td><button class="btn sm ghost" type="button" title="Apagar este aluno">🗑 Apagar</button></td>';
       A.$('.nome', tr).textContent = r.nome;
       if (geral) A.$('.secs', tr).textContent = r.secoes.length + ' · ' + r.secoes.join(', ');
-      else A.$('button', tr).onclick = function () { apagar(r); };
+      A.$('button', tr).onclick = function () { apagar(r, geral); };
       tbody.appendChild(tr);
     });
     mais.hidden = L.length <= TOP;
     mais.textContent = mostrarTudo ? 'Mostrar só os ' + TOP + ' primeiros' : 'Mostrar mais (' + (L.length - TOP) + ')';
     var n = filtrados().length;
     info.textContent = n + ' resultado' + (n === 1 ? '' : 's') + ' neste filtro · atualiza a cada 20 s';
-    A.$('#limpar').disabled = !n;
+    var lb = A.$('#limpar');
+    lb.disabled = !n;
+    lb.textContent = '🗑 Limpar ' + (selAno.value === 'todos' ? 'todos os anos' : 'ingresso ' + selAno.value) +
+      (filtro.value === 'geral' ? '' : ' · só esta seção') + ' (' + n + ')';
   }
 
-  function apagar(r) {
+  /* geral = apaga o aluno em todas as seções desta matéria (mesmo ano) */
+  function apagar(r, geral) {
+    var onde = geral
+      ? 'todos os resultados dele em <b>' + A.esc(materia().titulo) + '</b> (' + A.esc(r.secoes.join(', ')) + ')'
+      : 'o resultado em <b>' + A.esc(tituloSecao(r.secao)) + '</b>';
     A.confirm({
-      icon: '🗑', danger: true, title: 'Apagar ' + r.nome + '?',
-      msg: 'Remove o resultado em <b>' + A.esc(tituloSecao(r.secao)) + '</b>. O aluno poderá fazer este desafio de novo.',
+      icon: '🗑', danger: true, title: 'Apagar ' + r.nome + (r.ano ? ' (' + r.ano + ')' : '') + '?',
+      msg: 'Remove ' + onde + '. O aluno poderá fazer de novo.',
       ok: 'Apagar', cancel: 'Cancelar'
     }).then(function (sim) {
       if (!sim) return;
-      api('admin_apagar', { materia: r.materia, secao: r.secao, ano: r.ano, nome: r.nome })
+      api('admin_apagar', { materia: materia().id, secao: geral ? 'todas' : r.secao, ano: r.ano, nome: r.nome })
         .then(function () { A.toast('Apagado'); carregar(); })
         .catch(function (e) { A.toast(e.message); });
     });

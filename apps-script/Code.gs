@@ -236,13 +236,22 @@ function adminResultados() {
   return Object.assign({ linhas: linhas }, adminEstado());
 }
 
+/* apaga um aluno: { materia, ano, nome, secao: id | 'todas' } */
 function adminApagar(d) {
-  const k = recKey_(String(d.materia || ''), String(d.secao || ''), String(d.ano || ''), chaveNome_(String(d.nome || '')));
+  const materia = String(d.materia || '');
+  const ano = String(d.ano || '');
+  const chave = chaveNome_(String(d.nome || ''));
+  const secao = String(d.secao || '');
+  const secoes = secao === 'todas' && QUESTOES[materia] ? Object.keys(QUESTOES[materia].secoes || {}) : [secao];
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(20000)) falha_(503, 'Servidor ocupado.');
   try {
-    PROPS.deleteProperty(k);
-    CACHE.remove('n:' + k);
+    secoes.forEach(function (sec) {
+      const k = recKey_(materia, sec, ano, chave);
+      PROPS.deleteProperty(k);
+      PROPS.deleteProperty('r|' + sec + '|' + chave);   // formato antigo
+      CACHE.remove('n:' + k);
+    });
   } finally {
     lock.releaseLock();
   }
