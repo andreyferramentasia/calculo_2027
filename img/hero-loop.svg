@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 380" font-family="JetBrains Mono, Consolas, monospace">
+  <style>
+    .spin { transform-origin: 220px 190px; animation: spin 6s linear infinite; }
+    .bob  { animation: bob 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .b2 { animation-delay: -1s; } .b3 { animation-delay: -2s; }
+    .dash { animation: dash 1s linear infinite; }
+    .blink { animation: blink 1s steps(1) infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes bob { 0%,100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-7px) rotate(var(--r, 0deg)); } }
+    @keyframes dash { to { stroke-dashoffset: -28; } }
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+
+  <!-- pista do loop -->
+  <circle cx="226" cy="196" r="122" fill="none" stroke="#17171c" stroke-width="20"/>
+  <circle cx="220" cy="190" r="122" fill="none" stroke="#17171c" stroke-width="20"/>
+  <circle cx="220" cy="190" r="122" fill="none" stroke="#ffffff" stroke-width="13"/>
+  <circle class="dash" cx="220" cy="190" r="122" fill="none" stroke="#ffcf33" stroke-width="13" stroke-dasharray="14 14"/>
+
+  <!-- bolinha percorrendo -->
+  <g class="spin">
+    <circle cx="345" cy="193" r="15" fill="#17171c"/>
+    <circle cx="342" cy="190" r="15" fill="#ff5c93" stroke="#17171c" stroke-width="3.5"/>
+  </g>
+
+  <!-- centro -->
+  <circle cx="224" cy="194" r="62" fill="#17171c"/>
+  <circle cx="220" cy="190" r="62" fill="#b6f26b" stroke="#17171c" stroke-width="3.5"/>
+  <text x="220" y="174" text-anchor="middle" fill="#17171c" font-size="12" font-weight="800" letter-spacing="3">VOLTA</text>
+  <g fill="#17171c" font-size="50" font-weight="800" text-anchor="middle">
+    <text x="220" y="222" opacity="0">1<animate attributeName="opacity" values="1;0;0;0;0" keyTimes="0;.2;.4;.6;.8" calcMode="discrete" dur="30s" repeatCount="indefinite"/></text>
+    <text x="220" y="222" opacity="0">2<animate attributeName="opacity" values="0;1;0;0;0" keyTimes="0;.2;.4;.6;.8" calcMode="discrete" dur="30s" repeatCount="indefinite"/></text>
+    <text x="220" y="222" opacity="0">3<animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;.2;.4;.6;.8" calcMode="discrete" dur="30s" repeatCount="indefinite"/></text>
+    <text x="220" y="222" opacity="0">4<animate attributeName="opacity" values="0;0;0;1;0" keyTimes="0;.2;.4;.6;.8" calcMode="discrete" dur="30s" repeatCount="indefinite"/></text>
+    <text x="220" y="222" opacity="0">5<animate attributeName="opacity" values="0;0;0;0;1" keyTimes="0;.2;.4;.6;.8" calcMode="discrete" dur="30s" repeatCount="indefinite"/></text>
+  </g>
+
+  <!-- adesivos -->
+  <g class="bob" style="--r:-4deg">
+    <rect x="156" y="30" width="140" height="50" rx="14" fill="#17171c"/>
+    <rect x="150" y="24" width="140" height="50" rx="14" fill="#ffcf33" stroke="#17171c" stroke-width="3.5"/>
+    <text x="220" y="55" text-anchor="middle" dominant-baseline="middle" fill="#17171c" font-size="18" font-weight="800">i &lt;= 5 ?</text>
+  </g>
+  <g class="bob b2" style="--r:5deg">
+    <rect x="316" y="252" width="118" height="48" rx="14" fill="#17171c"/>
+    <rect x="310" y="246" width="118" height="48" rx="14" fill="#8fb8ff" stroke="#17171c" stroke-width="3.5"/>
+    <text x="369" y="271" text-anchor="middle" dominant-baseline="middle" fill="#17171c" font-size="16" font-weight="800">print(i)</text>
+  </g>
+  <g class="bob b3" style="--r:-6deg">
+    <rect x="18" y="252" width="112" height="48" rx="14" fill="#17171c"/>
+    <rect x="12" y="246" width="112" height="48" rx="14" fill="#ff5c93" stroke="#17171c" stroke-width="3.5"/>
+    <text x="68" y="271" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="16" font-weight="800">i += 1</text>
+  </g>
+
+  <!-- terminal -->
+  <rect x="148" y="336" width="160" height="38" rx="10" fill="#17191e" stroke="#17171c" stroke-width="3"/>
+  <text x="162" y="360" fill="#b6f26b" font-size="14" font-weight="700">&gt; 1 2 3 4 5</text>
+  <rect class="blink" x="282" y="347" width="8" height="16" fill="#b6f26b"/>
+</svg>

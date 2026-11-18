@@ -1,0 +1,179 @@
+/* =========================================================
+   BASE — tokens de cor, reset e tipografia
+   Estilo: neo-brutalista (bordas grossas, sombras sólidas,
+   cores fortes). Código sempre em painel escuro tipo IDE.
+   ========================================================= */
+:root {
+  /* página */
+  --bg: #fff4dc;
+  --bg2: #fbe9c4;
+  --panel: #ffffff;
+  --panel2: #fff7e8;
+  --panel3: #ffe9bd;
+  --line: #ecdcb8;          /* separadores suaves */
+  --ink: #17171c;           /* bordas grossas */
+  --hard: #17171c;          /* cor da sombra sólida */
+  --text: #17171c;
+  --muted: #5c5f68;
+  --faint: #74777f;
+
+  /* cores de destaque */
+  --acc: #ffcf33;           /* amarelo */
+  --acc-ink: #17171c;
+  --acc2: #3b82f6;          /* azul */
+  --ok: #15803d;
+  --lime: #b6f26b;
+  --bad: #ef4466;
+  --warn: #f59e0b;
+  --vio: #8b5cf6;
+  --pink: #ff5c93;
+  --orange: #ff8a3d;
+
+  /* tipos de dado */
+  --t-int: #2f6fe0;
+  --t-float: #0e9aa7;
+  --t-str: #e8590c;
+  --t-bool: #7c3aed;
+  --t-list: #16a34a;
+  --t-none: #868e96;
+  --t-fn: #db2777;
+  --t-other: #d97706;
+
+  /* sintaxe sobre fundo claro (tabelas, widgets) */
+  --sx-kw: #8b2fd1;
+  --sx-str: #2b8a3e;
+  --sx-num: #d9480f;
+  --sx-com: #8a83a0;
+  --sx-fn: #1c63c7;
+  --sx-bi: #b07000;
+  --sx-op: #0b7285;
+
+  /* painéis de código (sempre escuros) */
+  --code-bg: #17191e;
+  --code-bg2: #20232a;
+  --code-text: #eef0f3;
+  --code-line: #31353e;
+  --code-faint: #7d8590;
+
+  --radius: 16px;
+  --radius-s: 11px;
+  --bw: 2.5px;                                  /* espessura da borda */
+  --shadow: 5px 5px 0 var(--hard);
+  --shadow-s: 3px 3px 0 var(--hard);
+  --font: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --display: "Bricolage Grotesque", "DM Sans", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  --sidebar: 320px;
+  color-scheme: light;
+}
+
+/* escuro: grafite neutro, bordas e sombras creme (o "avesso" do tema claro) */
+:root[data-theme="dark"] {
+  --bg: #0f1012;
+  --bg2: #151619;
+  --panel: #1b1d21;
+  --panel2: #222529;
+  --panel3: #2c2f35;
+  --line: #33373e;
+  --ink: #e9e3d3;
+  --hard: #e9e3d3;
+  --text: #f2efe8;
+  --muted: #b4b7bf;
+  --faint: #8a8f99;
+  --code-bg: #121316;
+  --code-bg2: #1a1c20;
+  --acc-ink: #17171c;
+  --acc2: #5b9bff;
+  --ok: #4ade80;
+  --bad: #ff5c7c;
+  --vio: #a78bfa;
+  --t-int: #5b9bff;
+  --t-float: #22d3ee;
+  --t-str: #ff9f5a;
+  --t-bool: #b197fc;
+  --t-list: #4ade80;
+  --t-fn: #ff79b0;
+  --t-other: #ffcf33;
+  color-scheme: dark;
+}
+
+/* sintaxe em fundo escuro: painéis de código e tema escuro */
+:root[data-theme="dark"],
+.codeblock, .lab-code, .compare pre, .pycall, .pg-editor, .q .codeblock {
+  --sx-kw: #d6a4ff;
+  --sx-str: #b8f28a;
+  --sx-num: #ffab76;
+  --sx-com: #7d8590;
+  --sx-fn: #8fb8ff;
+  --sx-bi: #ffd866;
+  --sx-op: #7ee0ff;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  /* pontilhado sutil no fundo */
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 13%, transparent) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  /* sem ligaduras: <= continua aparecendo como <= (não ≤) */
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0, "liga" 0;
+}
+textarea, input, select, button { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+
+h1, h2, h3, h4, h5 { font-family: var(--display); line-height: 1.12; margin: 0 0 .6em; letter-spacing: -.02em; }
+h1 { font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 800; }
+h2 { font-size: 1.65rem; font-weight: 800; margin-top: 2em; }
+h3 { font-size: 1.2rem; font-weight: 700; margin-top: 1.5em; }
+p { margin: 0 0 1em; }
+a { color: var(--acc2); text-decoration: none; font-weight: 600; }
+a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+img { max-width: 100%; display: block; }
+ul, ol { padding-left: 1.3em; margin: 0 0 1em; }
+li { margin: .25em 0; }
+
+code, kbd, pre { font-family: var(--mono); }
+/* código no meio do texto: pílula escura */
+:not(pre) > code {
+  background: var(--code-bg);
+  color: #ffd866;
+  padding: .12em .45em;
+  border-radius: 7px;
+  font-size: .86em;
+  white-space: nowrap;
+}
+
+kbd {
+  background: #fff;
+  color: #17171c;
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 var(--hard);
+  border-radius: 7px;
+  padding: 0 .45em;
+  font-size: .82em;
+  font-weight: 700;
+}
+
+table { border-collapse: collapse; width: 100%; margin: 0 0 1.2em; font-size: .95em; }
+th, td { border-bottom: 2px solid var(--line); padding: .55em .7em; text-align: left; vertical-align: top; }
+th { color: var(--muted); font-weight: 700; font-size: .78em; text-transform: uppercase; letter-spacing: .06em; }
+
+button { font: inherit; cursor: pointer; }
+input, select, textarea { font: inherit; color: inherit; }
+
+::selection { background: var(--acc); color: var(--acc-ink); }
+
+.muted { color: var(--muted); }
+.mono { font-family: var(--mono); }
+.hidden { display: none !important; }
+
+* { scrollbar-width: thin; scrollbar-color: var(--ink) transparent; }

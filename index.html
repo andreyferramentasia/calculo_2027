@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Algoritmos em Python</title>
+  <meta name="description" content="Aulas de algoritmos em Python com animações passo a passo: variáveis, condicionais, loops, listas, matrizes e bibliotecas.">
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- estilos -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/lab.css">
+</head>
+<body>
+  <div class="app">
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" aria-label="Aulas">
+      <a class="brand" href="#/">
+        <img src="img/logo.svg" alt="">
+        <div><b>Algoritmos</b><small>Python do zero às matrizes</small></div>
+      </a>
+      <nav class="nav" id="nav"></nav>
+      <div class="sidebar-foot">
+        <button class="btn sm" id="themeBtn">☾ Escuro</button>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <!-- ============ CONTEÚDO ============ -->
+    <div class="main">
+      <header class="topbar">
+        <button class="btn icon" id="menuBtn" aria-label="Abrir menu">☰</button>
+        <img src="img/logo.svg" alt="">
+        <b>Algoritmos em Python</b>
+      </header>
+      <main id="view" class="content"></main>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <!-- núcleo -->
+  <script src="js/core/namespace.js"></script>
+  <script src="js/core/highlight.js"></script>
+  <script src="js/core/viz.js"></script>
+  <script src="js/core/stepper.js"></script>
+  <script src="js/core/quiz.js"></script>
+
+  <!-- widgets interativos -->
+  <script src="js/widgets/types.js"></script>
+  <script src="js/widgets/ops.js"></script>
+  <script src="js/widgets/fstring.js"></script>
+  <script src="js/widgets/range.js"></script>
+  <script src="js/widgets/slice.js"></script>
+  <script src="js/widgets/matrix.js"></script>
+  <script src="js/widgets/montecarlo.js"></script>
+  <script src="js/widgets/reshape.js"></script>
+
+  <!-- aulas (para adicionar uma aula: crie o arquivo e inclua aqui) -->
+  <script src="js/lessons/_modules.js"></script>
+  <script src="js/lessons/01-introducao.js"></script>
+  <script src="js/lessons/02-variaveis.js"></script>
+  <script src="js/lessons/03-operadores.js"></script>
+  <script src="js/lessons/04-entrada-saida.js"></script>
+  <script src="js/lessons/05-condicionais.js"></script>
+  <script src="js/lessons/06-while.js"></script>
+  <script src="js/lessons/07-for-range.js"></script>
+  <script src="js/lessons/08-loops-aninhados.js"></script>
+  <script src="js/lessons/09-strings.js"></script>
+  <script src="js/lessons/10-listas.js"></script>
+  <script src="js/lessons/11-busca-ordenacao.js"></script>
+  <script src="js/lessons/12-funcoes.js"></script>
+  <script src="js/lessons/13-matrizes.js"></script>
+  <script src="js/lessons/14-operacoes-matrizes.js"></script>
+  <script src="js/lessons/15-math-random.js"></script>
+  <script src="js/lessons/16-numpy.js"></script>
+
+  <!-- app -->
+  <script src="js/playground.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
