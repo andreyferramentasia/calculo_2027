@@ -12,19 +12,15 @@
     goals: ['Histograma', 'Assimetria', 'Quartis', 'IQR e outliers', 'Linha do tempo'],
     body: [
       { h2: '1. Histograma: a forma dos dados numéricos' },
-      { html: '<p>O <b>histograma</b> agrupa os valores em <b>faixas</b> (0–10, 10–20…) e desenha uma barra por faixa, com altura igual à quantidade de dados nela. As barras ficam <b>coladas</b>, porque as faixas são contínuas (no gráfico de barras, as categorias são separadas).</p>' },
-      { img: 'img/aulas/secao1-histograma-suporte.jpg', alt: 'Histograma do tempo de resposta do suporte com cauda à direita', caption: 'Tempo de resposta do suporte em 60 chamados: a cauda longa à direita indica assimetria à direita.', fonte: 'elaborado pelo autor.' },
-      { html: '<table><thead><tr><th>Forma</th><th>O que indica</th></tr></thead><tbody>' +
-        '<tr><td>simétrico</td><td>média e mediana próximas</td></tr>' +
-        '<tr><td>assimétrico à direita (cauda à direita)</td><td>média &gt; mediana: poucos valores altos puxam a média</td></tr>' +
-        '<tr><td>assimétrico à esquerda (cauda à esquerda)</td><td>média &lt; mediana: poucos valores baixos puxam a média</td></tr></tbody></table>' +
-        '<p class="formula">largura da faixa ≈ (máximo − mínimo) ÷ número de faixas</p>' },
-      { tip: '<p>Faixas largas demais escondem padrões; estreitas demais viram ruído. Comece com 6 a 10 faixas.</p>' },
+      { html: '<p>O <b>histograma</b> agrupa os valores em <b>faixas</b> e desenha uma barra por faixa (barras coladas, porque as faixas são contínuas). Ele mostra a <b>forma</b> dos dados.</p>' },
+      { html: A.ilus('histograma', 'Poucos valores altos formam a cauda e puxam a média para a direita da mediana.') },
+      { html: '<table><thead><tr><th>Forma</th><th>Média x mediana</th></tr></thead><tbody>' +
+        '<tr><td>simétrica</td><td>próximas</td></tr><tr><td>cauda à direita</td><td>média &gt; mediana</td></tr><tr><td>cauda à esquerda</td><td>média &lt; mediana</td></tr></tbody></table>' },
+      { tip: '<p>Comece com 6 a 10 faixas: poucas escondem o padrão, muitas viram ruído.</p>' },
 
       { h2: '2. Boxplot: o resumo de cinco números' },
-      { html: '<p>O <b>boxplot</b> resume os dados em cinco números: <b>mínimo, Q1, mediana, Q3 e máximo</b>. A caixa vai de Q1 a Q3 (os 50% centrais), com uma linha na mediana. As hastes vão até os valores mais extremos que <b>não</b> são outliers.</p>' +
-        '<p><b>Dividir ao meio:</b> ordene, ache a mediana; Q1 é a mediana da metade de baixo e Q3 a da metade de cima. Com n ímpar, a mediana fica fora das metades.</p>' +
-        '<p class="formula">IQR = Q3 − Q1 &nbsp;·&nbsp; outlier: acima de Q3 + 1,5·IQR ou abaixo de Q1 − 1,5·IQR</p>' },
+      { html: '<p>O <b>boxplot</b> resume tudo em <b>mínimo, Q1, mediana, Q3 e máximo</b>. Q1 e Q3 são as medianas das metades de baixo e de cima.</p>' +
+        '<p class="formula">IQR = Q3 − Q1 &nbsp;·&nbsp; outlier: além de Q3 + 1,5·IQR (ou Q1 − 1,5·IQR)</p>' },
       { lab: {
         title: 'Quartis dividindo ao meio',
         params: { dados: [2, 2, 3, 3, 4, 4, 5, 6, 15] },
@@ -62,17 +58,13 @@
         }
       } },
       { widget: 'boxplot' },
-      { warn: '<p>Caixa maior <b>não</b> significa mais dados: cada uma das quatro partes do boxplot (mín.–Q1, Q1–mediana, mediana–Q3, Q3–máx.) sempre tem <b>25%</b> dos dados. Parte comprida = dados mais espalhados ali.</p>' },
+      { warn: '<p>Cada parte do boxplot tem <b>25%</b> dos dados. Parte comprida = dados mais espalhados, não mais dados.</p>' },
       { code: 'import matplotlib.pyplot as plt\n\ntempos = [2, 2, 3, 3, 4, 4, 5, 6, 15]\nplt.boxplot(tempos, vert=False)\nplt.xlabel("Tempo de carregamento (segundos)")\nplt.title(f"Tempo de carregamento em {len(tempos)} testes")\nplt.show()' },
 
       { h2: '3. Gráfico de linha do tempo' },
-      { html: '<p>O <b>gráfico de linha</b> mostra um valor ao longo do tempo: o eixo horizontal é o tempo, o vertical é o valor. Serve para ver <b>tendências</b> (subindo, descendo, estável) e <b>padrões cíclicos</b> (picos que se repetem, como todo fim de semana).</p>' },
-      { img: 'img/aulas/secao3-linha-tempo-usuarios.jpg', alt: 'Dois gráficos de linha dos mesmos usuários ativos com escalas diferentes', caption: 'Os mesmos usuários ativos diários: o eixo cortado faz oscilações moderadas parecerem dramáticas.', fonte: 'elaborado pelo autor.' },
-      { html: '<table><thead><tr><th>Sinal de alerta</th><th>Por que desconfiar</th></tr></thead><tbody>' +
-        '<tr><td>eixo vertical não começa em zero</td><td>exagera oscilações pequenas</td></tr>' +
-        '<tr><td>escala esticada ou espremida</td><td>distorce a impressão de tendência</td></tr>' +
-        '<tr><td>datas com espaçamento desigual</td><td>datas tratadas como rótulos, não como tempo real</td></tr>' +
-        '<tr><td>contagem em vez de taxa</td><td>ignora que a população mudou ao longo do tempo</td></tr></tbody></table>' }
+      { html: '<p>O <b>gráfico de linha</b> mostra um valor ao longo do tempo: <b>tendência</b> (sobe, desce) e <b>padrão cíclico</b> (picos todo fim de semana). Cuidado com a escala:</p>' },
+      { html: A.ilus('linhaTempo', 'Os mesmos dados: só a escala do eixo mudou.') },
+      { tip: '<p>Antes de confiar: <b>o eixo começa em 0? as datas têm espaçamento igual? é taxa ou só contagem?</b></p>' },
     ],
     quiz: [
       { q: 'Um histograma tem cauda longa à direita. Então, em geral:', options: ['média = mediana', 'média &gt; mediana', 'média &lt; mediana', 'não há mediana'], answer: 1, explain: 'Poucos valores altos puxam a média para cima.' },

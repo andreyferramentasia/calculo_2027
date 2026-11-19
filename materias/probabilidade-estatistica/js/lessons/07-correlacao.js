@@ -8,21 +8,14 @@
     goals: ['Dados bivariados', 'Dispersão', 'Coeficiente r', 'Variável de confusão'],
     body: [
       { h2: '1. Diagrama de dispersão' },
-      { html: '<p>Quando cada observação traz <b>duas</b> informações numéricas (um par x, y), o dado é <b>bivariado</b>. No <b>diagrama de dispersão</b>, cada par vira um ponto.</p>' +
-        '<table><thead><tr><th>O que você vê</th><th>Significa</th></tr></thead><tbody>' +
-        '<tr><td>pontos subindo da esquerda para a direita</td><td>relação <b>positiva</b></td></tr>' +
-        '<tr><td>pontos descendo</td><td>relação <b>negativa</b></td></tr>' +
-        '<tr><td>pontos espalhados, sem padrão</td><td>nenhuma relação (linear)</td></tr></tbody></table>' },
+      { html: '<p>Cada ponto é um par (x, y). Pontos <b>subindo</b> = relação positiva; <b>descendo</b> = negativa; <b>espalhados</b> = nenhuma.</p>' },
       { widget: 'dispersao', opts: { dados: 'seguidores' } },
-      { tip: '<p>Troque o conjunto de dados, clique no gráfico para pôr pontos e veja o <b>r</b> mudar. Tente colocar um ponto bem longe dos outros.</p>' },
+      { tip: '<p>Clique no gráfico para pôr pontos. Ponha um bem longe dos outros e veja o r mudar.</p>' },
 
       { h2: '2. O coeficiente de correlação r' },
-      { html: '<p>O <b>r</b> resume em um número, entre <b>−1 e +1</b>, a força e a direção de uma relação <b>linear</b>. Perto de ±1: pontos quase em linha reta. Perto de 0: espalhados. O sinal dá a direção.</p>' +
-        '<table><thead><tr><th>r</th><th>Leitura</th></tr></thead><tbody>' +
-        '<tr><td>−1</td><td>negativa perfeita</td></tr><tr><td>−0,70</td><td>negativa forte</td></tr><tr><td>−0,50</td><td>negativa moderada</td></tr><tr><td>−0,30</td><td>negativa fraca</td></tr>' +
-        '<tr><td>0</td><td>nenhuma relação linear</td></tr><tr><td>+0,30</td><td>positiva fraca</td></tr><tr><td>+0,50</td><td>positiva moderada</td></tr><tr><td>+0,70</td><td>positiva forte</td></tr><tr><td>+1</td><td>positiva perfeita</td></tr></tbody></table>' +
+      { html: '<p>O <b>r</b> vai de <b>−1 a +1</b>: o sinal dá a direção e a distância de zero dá a força (|r| ≥ 0,7 forte, ≥ 0,5 moderada, ≥ 0,3 fraca).</p>' +
         '<p class="formula">r = Σ(x − x̄)(y − ȳ) ÷ [ (n − 1) · s<sub>x</sub> · s<sub>y</sub> ]</p>' },
-      { img: 'img/aulas/secao2-forcas-correlacao.jpg', alt: 'Seis diagramas de dispersão com correlações diferentes', caption: 'Quanto mais perto de uma reta, mais forte a correlação.', fonte: 'elaborado pelo autor.' },
+      { html: A.ilus('correlacoes', 'Quanto mais perto de uma reta, mais forte a correlação.') },
       { lab: {
         title: 'Calculando r passo a passo',
         params: { x: [2, 4, 6], y: [3, 5, 4] },
@@ -62,16 +55,11 @@
         }
       } },
       { code: 'import statistics\n\nhoras = [2, 3, 4, 5, 6]\nnotificacoes = [10, 12, 15, 14, 20]\nr = statistics.correlation(horas, notificacoes)\nprint(f"Correlação: {r:.4f}")', out: 'Correlação: 0.9231' },
-      { warn: '<p>Calcule r só depois de <b>olhar o gráfico</b>. Um r alto pode enganar se os pontos seguem uma curva, e não uma reta.</p>' },
+      { warn: '<p>Olhe o gráfico antes: r alto engana se os pontos fazem uma curva.</p>' },
 
       { h2: '3. Propriedades e o cuidado com causa e efeito' },
-      { html: '<table><thead><tr><th>Propriedade</th><th>Significa</th></tr></thead><tbody>' +
-        '<tr><td>−1 ≤ r ≤ 1</td><td>nunca sai desse intervalo</td></tr>' +
-        '<tr><td>não tem unidade</td><td>trocar metros por centímetros não muda r</td></tr>' +
-        '<tr><td>x e y podem trocar de lugar</td><td>r(x, y) = r(y, x)</td></tr>' +
-        '<tr><td><b>correlação ≠ causalidade</b></td><td>relação forte não prova que uma causa a outra</td></tr></tbody></table>' +
-        '<p>Vendas de sorvete e afogamentos sobem juntos no verão. Sorvete não causa afogamento: o <b>calor</b> é a <b>variável de confusão</b> que mexe nas duas. No app: quem recebe mais notificações usa mais, mas talvez quem já é engajado gere mais notificações.</p>' },
-      { tip: '<p>Diante de "estudo encontra relação entre X e Y", pergunte: <b>existe uma terceira variável que explique as duas?</b></p>' }
+      { html: '<p>r não tem unidade e r(x, y) = r(y, x). Mas <b>correlação não é causalidade</b>: sorvete e afogamento sobem juntos no verão porque o <b>calor</b> (variável de confusão) mexe nos dois.</p>' },
+      { tip: '<p>Diante de "X está ligado a Y", pergunte: <b>que terceira variável explicaria os dois?</b></p>' },
     ],
     quiz: [
       { q: 'r = −0,85 indica uma relação:', options: ['positiva fraca', 'negativa forte', 'nenhuma', 'negativa fraca'], answer: 1, explain: 'Sinal negativo = direção de descida; |r| = 0,85 = forte.' },

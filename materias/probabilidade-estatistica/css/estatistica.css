@@ -56,3 +56,8 @@
   .est-barra { grid-template-columns: 80px 1fr; }
   .est-barra .v { grid-column: 1 / -1; text-align: left; }
 }
+
+/* ilustrações das aulas (js/ilustracoes.js) */
+figure.ilus { margin: 14px auto 20px; max-width: 580px; }
+figure.ilus svg { display: block; width: 100%; height: auto; }
+figure.ilus figcaption { text-align: center; font-size: .86rem; color: var(--muted); margin-top: 8px; }
