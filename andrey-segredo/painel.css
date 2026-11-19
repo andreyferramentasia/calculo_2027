@@ -1,7 +1,7 @@
 /* =========================================================
    PAINEL DO PROFESSOR (andrey-segredo)
    ========================================================= */
-.prof { max-width: 1100px; margin: 0 auto; padding: 28px 16px 60px; }
+.prof { max-width: 1320px; margin: 0 auto; padding: 28px 16px 60px; }
 .prof [hidden] { display: none !important; }
 .prof-login { max-width: 420px; display: grid; gap: 12px; }
 
@@ -22,7 +22,77 @@
 .prof-secao.on .muted { color: #2f3a1f; }
 .prof-secao .btn { justify-self: start; }
 
-.prof-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+/* barra do ranking: cartão com filtros em cima e ações embaixo */
+.prof-tools {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 2px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: var(--shadow-s);
+}
+.prof-filtros {
+  display: grid;
+  grid-template-columns: minmax(200px, 1.1fr) minmax(170px, .8fr) minmax(220px, 2fr);
+  gap: 12px;
+}
+.prof-filtros select { width: 100%; }
+.prof-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 2px dashed var(--line);
+}
+.prof-info { font-size: .88rem; }
+.prof-info b { color: var(--text); }
+.prof-grupo { display: flex; align-items: center; gap: 8px; }
+.prof-sep { width: 2px; height: 26px; margin: 0 4px; background: var(--line); border-radius: 2px; }
+
+.prof-ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.prof-ic span { font: 800 .78rem var(--mono); letter-spacing: .03em; }
+.prof-ic { height: 38px; padding: 0 12px; gap: 6px; }
+.prof-ic.icon { width: 38px; padding: 0; }
+.prof-n { min-width: 1.4em; text-align: center; }
+
+/* dica rápida (no lugar do title, que demora a aparecer) */
+.prof-ic[data-tip] { position: relative; }
+.prof-ic[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: var(--text);   /* invertido: escuro no tema claro, claro no escuro */
+  color: var(--panel);
+  font: 600 .75rem var(--font);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity .12s, transform .12s;
+  z-index: 5;
+}
+.prof-ic[data-tip]:hover::after,
+.prof-ic[data-tip]:focus-visible::after { opacity: 1; transform: none; }
+
+@media (max-width: 760px) {
+  .prof-filtros { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .prof-busca { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .prof-filtros { grid-template-columns: minmax(0, 1fr); }
+  .prof-materia { flex: 1; min-width: 0; }
+  .prof-materia select { min-width: 0; width: 100%; }
+  .prof-acoes { justify-content: flex-end; }
+  .prof-info { flex-basis: 100%; }
+}
+
 .prof-tools select,
 .prof-materia select {
   font: 700 .95rem var(--font);
@@ -79,12 +149,11 @@
 .prof-head .prof-h2 { margin: 0; }
 .prof-materia { display: flex; align-items: center; gap: 10px; font: 800 1.1rem var(--display); }
 .prof-materia select { font-size: 1rem; min-width: 260px; }
-.prof-limpar { margin-left: auto; background: var(--pink); color: #17171c; }
+.prof-limpar { background: var(--pink); color: #17171c; }
 .prof-limpar:disabled { opacity: .45; cursor: default; }
 .prof-vazio-sec { grid-column: 1 / -1; margin: 0; }
 
 .prof-campo { display: grid; gap: 4px; font: 800 .72rem var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
-.prof-tools { align-items: flex-end; }
 .prof-aviso {
   margin: 0 0 14px;
   padding: 12px 14px;
@@ -95,14 +164,21 @@
   font-weight: 600;
 }
 
+.prof-busca-box { position: relative; display: block; }
+.prof-busca-box svg {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 17px; height: 17px; fill: none; stroke: var(--muted); stroke-width: 2.2; stroke-linecap: round;
+  pointer-events: none;
+}
 .prof-busca input {
   font: 600 .95rem var(--font);
   background: var(--panel);
   color: var(--text);
   border: 2px solid var(--ink);
   border-radius: 12px;
-  padding: 8px 12px;
-  min-width: 220px;
+  padding: 8px 12px 8px 36px;
+  width: 100%;
+  min-width: 0;
   outline: none;
   text-transform: none;
   letter-spacing: 0;

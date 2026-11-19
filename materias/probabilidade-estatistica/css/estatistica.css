@@ -1,0 +1,58 @@
+/* =========================================================
+   Probabilidade e Estatística — estilos dos widgets
+   (o resto vem de ../../nucleo/css)
+   ========================================================= */
+
+/* gráfico SVG genérico dos widgets */
+.est-svg { display: block; width: 100%; max-width: 760px; height: auto; margin: 4px auto 10px; overflow: visible; }
+.est-svg text { font: 700 12px var(--mono); fill: var(--text); }
+.est-svg .eixo { stroke: var(--ink); stroke-width: 2; }
+.est-svg .grade { stroke: var(--line); stroke-width: 1; }
+.est-svg .ponto { fill: var(--acc); stroke: var(--ink); stroke-width: 2; }
+.est-svg .ponto.out { fill: var(--pink); }
+.est-svg .linha { fill: none; stroke: var(--ink); stroke-width: 3; }
+.est-svg .area { fill: var(--acc); fill-opacity: .7; stroke: none; }
+.est-svg .faixa { fill: var(--acc2); fill-opacity: .14; }
+.est-svg .media { stroke: var(--pink); stroke-width: 3; }
+.est-svg .mediana { stroke: var(--acc2); stroke-width: 3; stroke-dasharray: 6 4; }
+.est-svg .caixa { fill: var(--acc); stroke: var(--ink); stroke-width: 2.5; }
+.est-svg .reta { stroke: var(--pink); stroke-width: 3.5; stroke-linecap: round; }
+.est-svg .extrap { fill: var(--bad); fill-opacity: .08; }
+
+/* números em destaque */
+.est-nums { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 10px; }
+.est-nums span { font: 700 .88rem var(--mono); padding: 5px 10px; border: 2px solid var(--ink); border-radius: 10px; background: var(--panel2); }
+.est-nums span b { font-weight: 800; }
+.est-nums .m { background: color-mix(in srgb, var(--pink) 25%, var(--panel2)); }
+.est-nums .md { background: color-mix(in srgb, var(--acc2) 22%, var(--panel2)); }
+.est-nums .ok { background: var(--lime); color: #17171c; }
+.est-nums .alerta { background: #ffc2cf; color: #17171c; }
+
+.est-legenda { display: flex; flex-wrap: wrap; gap: 14px; font-size: .84rem; color: var(--muted); }
+.est-legenda i { display: inline-block; width: 16px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 5px; }
+
+/* barras horizontais (taxa x contagem) */
+.est-barras { display: grid; gap: 7px; margin: 6px 0 12px; }
+.est-barra { display: grid; grid-template-columns: 110px 1fr 140px; gap: 10px; align-items: center; font: 700 .88rem var(--mono); }
+.est-barra .trilho { height: 24px; border: 2px solid var(--ink); border-radius: 7px; background: var(--panel2); overflow: hidden; }
+.est-barra .trilho i { display: block; height: 100%; background: var(--c, var(--acc)); border-right: 2px solid var(--ink); transition: width .3s; }
+.est-barra .v { text-align: right; }
+.est-titulo { font: 800 .8rem var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 10px 0 2px; }
+
+/* margem de erro: régua de 0 a 100 */
+.est-regua { position: relative; height: 46px; margin: 18px 6px 26px; border: 2px solid var(--ink); border-radius: 10px; background: var(--panel2); }
+.est-regua .int { position: absolute; top: 0; bottom: 0; background: var(--acc); border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); transition: left .25s, width .25s; }
+.est-regua .pt { position: absolute; top: -8px; bottom: -8px; width: 4px; margin-left: -2px; background: var(--pink); transition: left .25s; }
+.est-regua .marca { position: absolute; bottom: -22px; transform: translateX(-50%); font: 700 .75rem var(--mono); color: var(--muted); }
+
+/* pizza + barras */
+.est-duplo { display: grid; grid-template-columns: minmax(200px, 300px) 1fr; gap: 18px; align-items: center; }
+.est-cats { display: grid; gap: 6px; }
+.est-cats label { display: grid; grid-template-columns: 18px 1fr 80px; gap: 8px; align-items: center; }
+.est-cats .cor { width: 16px; height: 16px; border: 2px solid var(--ink); border-radius: 4px; }
+.est-cats input { min-width: 0; font: 600 .9rem var(--mono); padding: 6px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--panel2); color: var(--text); }
+@media (max-width: 700px) {
+  .est-duplo { grid-template-columns: 1fr; }
+  .est-barra { grid-template-columns: 80px 1fr; }
+  .est-barra .v { grid-column: 1 / -1; text-align: left; }
+}

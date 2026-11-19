@@ -12,11 +12,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <!-- estilos -->
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/lab.css">
-  <link rel="stylesheet" href="css/desafio.css">
+  <link rel="stylesheet" href="../../nucleo/css/base.css">
+  <link rel="stylesheet" href="../../nucleo/css/layout.css">
+  <link rel="stylesheet" href="../../nucleo/css/components.css">
+  <link rel="stylesheet" href="../../nucleo/css/lab.css">
+  <link rel="stylesheet" href="../../nucleo/css/desafio.css">
+  <link rel="stylesheet" href="../../nucleo/css/conteudo.css">
 </head>
 <body>
   <div class="app">
@@ -28,7 +29,7 @@
       </a>
       <nav class="nav" id="nav"></nav>
       <div class="sidebar-foot">
-        <a class="btn sm" href="../index.html">← Matérias</a>
+        <a class="btn sm" href="../../index.html">← Matérias</a>
         <button class="btn sm" id="themeBtn">☾ Escuro</button>
       </div>
     </aside>
@@ -47,14 +48,16 @@
   <div class="toast" id="toast" role="status"></div>
 
   <!-- núcleo -->
-  <script src="js/core/namespace.js"></script>
-  <script src="js/core/highlight.js"></script>
-  <script src="js/core/viz.js"></script>
-  <script src="js/core/stepper.js"></script>
-  <script src="js/core/partials.js"></script>
-  <script src="js/core/modal.js"></script>
-  <script src="js/core/quiz.js"></script>
-  <script src="js/core/exercicios.js"></script>
+  <script src="../../nucleo/js/core/namespace.js"></script>
+  <script src="../../nucleo/js/api-config.js"></script>   <!-- endereço da API (um só para todas as matérias) -->
+  <script src="js/config.js"></script>                    <!-- id desta matéria -->
+  <script src="../../nucleo/js/core/highlight.js"></script>
+  <script src="../../nucleo/js/core/viz.js"></script>
+  <script src="../../nucleo/js/core/stepper.js"></script>
+  <script src="../../nucleo/js/core/partials.js"></script>
+  <script src="../../nucleo/js/core/modal.js"></script>
+  <script src="../../nucleo/js/core/quiz.js"></script>
+  <script src="../../nucleo/js/core/exercicios.js"></script>
 
   <!-- widgets interativos -->
   <script src="js/widgets/types.js"></script>
@@ -87,12 +90,11 @@
 
   <!-- app -->
   <!-- desafio de fim de seção (API: apps-script/Code.gs) -->
-  <script src="js/desafio/config.js"></script>
-  <script src="js/desafio/api.js"></script>
-  <script src="js/desafio/formatos.js"></script>
-  <script src="js/desafio/desafio.js"></script>
+  <script src="../../nucleo/js/desafio/api.js"></script>
+  <script src="../../nucleo/js/desafio/formatos.js"></script>
+  <script src="../../nucleo/js/desafio/desafio.js"></script>
 
-  <script src="js/playground.js"></script>
-  <script src="js/app.js"></script>
+  <script src="../../nucleo/js/playground.js"></script>
+  <script src="../../nucleo/js/app.js"></script>
 </body>
 </html>

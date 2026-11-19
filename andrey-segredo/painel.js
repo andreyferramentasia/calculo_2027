@@ -209,11 +209,15 @@
     mais.hidden = !!termo || L.length <= TOP;
     mais.textContent = mostrarTudo ? 'Mostrar só os ' + TOP + ' primeiros' : 'Mostrar mais (' + (L.length - TOP) + ')';
     var n = filtrados().length;
-    info.textContent = n + ' resultado' + (n === 1 ? '' : 's') + ' neste filtro · atualiza a cada 20 s';
+    info.innerHTML = '<b>' + n + '</b> resultado' + (n === 1 ? '' : 's') + ' neste filtro · atualiza a cada 20 s';
     var lb = A.$('#limpar');
     lb.disabled = !n;
-    lb.textContent = '🗑 Limpar ' + (selAno.value === 'todos' ? 'todos os anos' : 'ingresso ' + selAno.value) +
-      (filtro.value === 'geral' ? '' : ' · só esta seção') + ' (' + n + ')';
+    A.$('#limpar-n').textContent = n;
+    var dica = 'Limpar ' + n + ' resultado' + (n === 1 ? '' : 's') + ' · ' +
+      (selAno.value === 'todos' ? 'todos os anos' : 'ingresso ' + selAno.value) +
+      (filtro.value === 'geral' ? '' : ' · só esta seção');
+    lb.setAttribute('data-tip', dica);
+    lb.setAttribute('aria-label', dica);
   }
 
   /* geral = apaga o aluno em todas as seções desta matéria (mesmo ano) */

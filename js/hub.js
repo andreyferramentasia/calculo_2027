@@ -1,6 +1,6 @@
 /* =========================================================
    HUB — página inicial: escolha da matéria
-   Para adicionar uma matéria: crie a pasta dela (como calculo/)
+   Para adicionar uma matéria: crie a pasta dela em materias/ (como materias/calculo-1/)
    e coloque o caminho em `href`. Sem href = "Em breve".
    ========================================================= */
 (function () {
@@ -9,18 +9,19 @@
       id: 'calculo', icon: '∫', color: '#ffcf33',
       title: 'Cálculo Diferencial e Integral I',
       desc: 'Começando por algoritmos em Python: variáveis, loops, listas, matrizes e NumPy, com animações passo a passo.',
-      href: 'calculo/index.html'
+      href: 'materias/calculo-1/index.html'
     },
     {
       id: 'discreta', icon: '∀', color: '#8fb8ff',
       title: 'Matemática Discreta',
       desc: 'Lógica, demonstrações, indução, conjuntos, contagem, RSA e Big O, com Python e exemplos interativos.',
-      href: 'discreta/index.html'
+      href: 'materias/matematica-discreta/index.html'
     },
     {
       id: 'probabilidade', icon: 'σ', color: '#ff5c93', tag: 'CEAD',
       title: 'Probabilidade e Estatística',
-      desc: 'Dados, medidas, probabilidade e distribuições.'
+      desc: 'Taxas, amostras, média, desvio padrão, gráficos, distribuição normal, correlação e regressão.',
+      href: 'materias/probabilidade-estatistica/index.html'
     },
     {
       id: 'requisitos', icon: '✓', color: '#c4a8ff',

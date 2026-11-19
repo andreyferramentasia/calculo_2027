@@ -1,11 +1,11 @@
 /* =========================================================
    Configuração da matéria Matemática Discreta.
    O motor (aulas, labs, quiz, desafio, playground) é o mesmo
-   do Cálculo, em ../calculo/js. Aqui ficam só os textos e o id.
+   de todas as matérias, em ../../nucleo. Aqui ficam só os textos e o id.
    ========================================================= */
 window.ALG = window.ALG || {};
 window.ALG.MATERIA = 'discreta';                     // mesmo id de js/hub.js e de Questoes.gs
-window.ALG.PARTIALS_BASE = '../calculo/partials/';
+window.ALG.PARTIALS_BASE = '../../nucleo/partials/';
 
 window.ALG.SITE = {
   titulo: 'Matemática Discreta',

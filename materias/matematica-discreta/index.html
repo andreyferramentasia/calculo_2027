@@ -11,12 +11,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- estilos: base compartilhada (calculo/css) + widgets desta matéria -->
-  <link rel="stylesheet" href="../calculo/css/base.css">
-  <link rel="stylesheet" href="../calculo/css/layout.css">
-  <link rel="stylesheet" href="../calculo/css/components.css">
-  <link rel="stylesheet" href="../calculo/css/lab.css">
-  <link rel="stylesheet" href="../calculo/css/desafio.css">
+  <!-- estilos: base compartilhada (nucleo/css) + widgets desta matéria -->
+  <link rel="stylesheet" href="../../nucleo/css/base.css">
+  <link rel="stylesheet" href="../../nucleo/css/layout.css">
+  <link rel="stylesheet" href="../../nucleo/css/components.css">
+  <link rel="stylesheet" href="../../nucleo/css/lab.css">
+  <link rel="stylesheet" href="../../nucleo/css/desafio.css">
+  <link rel="stylesheet" href="../../nucleo/css/conteudo.css">
   <link rel="stylesheet" href="css/discreta.css">
 </head>
 <body>
@@ -29,7 +30,7 @@
       </a>
       <nav class="nav" id="nav"></nav>
       <div class="sidebar-foot">
-        <a class="btn sm" href="../index.html">← Matérias</a>
+        <a class="btn sm" href="../../index.html">← Matérias</a>
         <button class="btn sm" id="themeBtn">☾ Escuro</button>
       </div>
     </aside>
@@ -48,16 +49,16 @@
   <div class="toast" id="toast" role="status"></div>
 
   <!-- núcleo compartilhado (mesmo motor do Cálculo) -->
-  <script src="../calculo/js/core/namespace.js"></script>
-  <script src="../calculo/js/desafio/config.js"></script>   <!-- endereço da API (um só para todas as matérias) -->
+  <script src="../../nucleo/js/core/namespace.js"></script>
+  <script src="../../nucleo/js/api-config.js"></script>   <!-- endereço da API (um só para todas as matérias) -->
   <script src="js/config.js"></script>                      <!-- MATERIA = 'discreta', textos da página inicial -->
-  <script src="../calculo/js/core/highlight.js"></script>
-  <script src="../calculo/js/core/viz.js"></script>
-  <script src="../calculo/js/core/stepper.js"></script>
-  <script src="../calculo/js/core/partials.js"></script>
-  <script src="../calculo/js/core/modal.js"></script>
-  <script src="../calculo/js/core/quiz.js"></script>
-  <script src="../calculo/js/core/exercicios.js"></script>
+  <script src="../../nucleo/js/core/highlight.js"></script>
+  <script src="../../nucleo/js/core/viz.js"></script>
+  <script src="../../nucleo/js/core/stepper.js"></script>
+  <script src="../../nucleo/js/core/partials.js"></script>
+  <script src="../../nucleo/js/core/modal.js"></script>
+  <script src="../../nucleo/js/core/quiz.js"></script>
+  <script src="../../nucleo/js/core/exercicios.js"></script>
 
   <!-- widgets interativos desta matéria -->
   <script src="js/widgets/tabela-verdade.js"></script>
@@ -81,11 +82,11 @@
   <script src="js/lessons/99-exercicios.js"></script>
 
   <!-- desafio de fim de seção (API: apps-script/Code.gs) -->
-  <script src="../calculo/js/desafio/api.js"></script>
-  <script src="../calculo/js/desafio/formatos.js"></script>
-  <script src="../calculo/js/desafio/desafio.js"></script>
+  <script src="../../nucleo/js/desafio/api.js"></script>
+  <script src="../../nucleo/js/desafio/formatos.js"></script>
+  <script src="../../nucleo/js/desafio/desafio.js"></script>
 
-  <script src="../calculo/js/playground.js"></script>
-  <script src="../calculo/js/app.js"></script>
+  <script src="../../nucleo/js/playground.js"></script>
+  <script src="../../nucleo/js/app.js"></script>
 </body>
 </html>

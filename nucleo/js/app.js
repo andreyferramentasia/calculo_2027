@@ -100,11 +100,11 @@
       });
       return d;
     },
+    /* { img, alt, caption?, fonte? }  (estilo em nucleo/css/conteudo.css) */
     img: function (s) {
-      var f = A.el('figure');
-      f.style.margin = '18px 0';
-      f.innerHTML = '<img src="' + s.img + '" alt="' + A.esc(s.alt || '') + '" style="border-radius:12px;border:1px solid var(--line)">' +
-        (s.caption ? '<figcaption class="muted" style="font-size:.85rem;margin-top:6px">' + A.esc(s.caption) + '</figcaption>' : '');
+      var f = A.el('figure', 'fig');
+      f.innerHTML = '<img loading="lazy" src="' + s.img + '" alt="' + A.esc(s.alt || '') + '">' +
+        (s.caption || s.fonte ? '<figcaption>' + (s.caption ? '<b>' + A.esc(s.caption) + '</b>' : '') + (s.fonte ? ' Fonte: ' + A.esc(s.fonte) : '') + '</figcaption>' : '');
       return f;
     }
   };

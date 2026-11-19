@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 380" font-family="JetBrains Mono, Consolas, monospace" font-weight="800">
+  <style>
+    .bob { animation: bob 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    .b2 { animation-delay: -1s; } .b3 { animation-delay: -2s; }
+    .grow { animation: grow 2.4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: bottom; }
+    .g2 { animation-delay: -.6s; } .g3 { animation-delay: -1.2s; } .g4 { animation-delay: -1.8s; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    @keyframes grow { from { transform: scaleY(.55); } to { transform: scaleY(1); } }
+  </style>
+  <!-- histograma -->
+  <g stroke="#17171c" stroke-width="4">
+    <rect class="grow" x="70" y="230" width="46" height="90" fill="#8fb8ff"/>
+    <rect class="grow g2" x="116" y="150" width="46" height="170" fill="#ffcf33"/>
+    <rect class="grow g3" x="162" y="80" width="46" height="240" fill="#ff7aa6"/>
+    <rect class="grow g4" x="208" y="140" width="46" height="180" fill="#b6f26b"/>
+    <rect class="grow" x="254" y="225" width="46" height="95" fill="#c4a8ff"/>
+    <line x1="50" y1="322" x2="330" y2="322"/>
+  </g>
+  <!-- curva normal por cima -->
+  <path d="M56 318 C 120 318, 140 70, 186 70 S 252 318, 318 318" fill="none" stroke="#17171c" stroke-width="9" stroke-linecap="round"/>
+  <path d="M56 318 C 120 318, 140 70, 186 70 S 252 318, 318 318" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+  <g class="bob"><circle cx="364" cy="94" r="40" fill="#17171c"/><circle cx="360" cy="90" r="40" fill="#ffcf33" stroke="#17171c" stroke-width="4"/><text x="360" y="104" font-size="38" text-anchor="middle" fill="#17171c">σ</text></g>
+  <g class="bob b2"><circle cx="374" cy="214" r="34" fill="#17171c"/><circle cx="370" cy="210" r="34" fill="#ff7aa6" stroke="#17171c" stroke-width="4"/><text x="370" y="222" font-size="32" text-anchor="middle" fill="#17171c">x̄</text></g>
+  <g class="bob b3" transform="translate(24 24)"><rect x="4" y="4" width="104" height="58" rx="14" fill="#17171c"/><rect width="104" height="58" rx="14" fill="#fff" stroke="#17171c" stroke-width="4"/><text x="52" y="38" font-size="20" text-anchor="middle" fill="#17171c">r=0,9</text></g>
+</svg>

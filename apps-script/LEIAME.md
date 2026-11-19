@@ -13,7 +13,7 @@ O site fica no GitHub Pages (só arquivos). Quem guarda **notas, senha e respost
    - Executar como: **Eu** · Quem pode acessar: **Qualquer pessoa**
    - Autorize quando o Google pedir.
 6. Copie a **URL do app da Web** (termina em `/exec`) e cole em
-   `calculo/js/desafio/config.js` → `DESAFIO_API`. Faça commit/push.
+   `nucleo/js/api-config.js` → `DESAFIO_API` (vale para todas as matérias). Faça commit/push.
 
 ## Atualizar perguntas ou código
 Edite no editor do Apps Script → **Implantar → Gerenciar implantações → ✏ →
@@ -25,7 +25,8 @@ Versão: Nova versão → Implantar**. A URL continua a mesma.
 
 ## Matérias e perguntas
 `Questoes.gs` → `QUESTOES[<matéria>].secoes[<seção>]`. O id da matéria é o mesmo de
-`js/hub.js` e de `MATERIA` em `<matéria>/js/desafio/config.js`.
+`js/hub.js` e de `MATERIA` em `materias/<pasta>/js/config.js`
+(ids: `calculo`, `discreta`, `probabilidade`, `requisitos`, `agro`).
 
 ### Formatos de pergunta
 Além da múltipla escolha, cada pergunta pode ter `tipo`: `vf` (verdadeiro/falso),
