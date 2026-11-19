@@ -77,12 +77,30 @@ a { color: inherit; text-decoration: none; }
 .hub-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
+  flex-wrap: wrap;
   color: #17171c;
 }
 
-.hub-brand img { width: 38px; height: 38px; }
-.hub-brand b { font: 800 1.3rem var(--display); letter-spacing: -.02em; }
+.hub-titulo { font: 800 1.3rem var(--display); letter-spacing: -.02em; }
+
+/* logo da Unigran: placa branca com borda grossa e sombra sólida */
+.unigran {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 14px 5px 6px;
+  background: #fff;
+  color: #17171c;
+  border: var(--bw) solid #17171c;
+  border-radius: 14px;
+  box-shadow: 3px 3px 0 #17171c;
+  transform: rotate(-1.5deg);
+}
+.unigran img { width: 40px; height: 40px; display: block; }
+.unigran-nome { display: grid; line-height: 1; }
+.unigran-nome b { font: 800 1.25rem var(--display); letter-spacing: -.01em; color: #1f63c6; }
+.unigran-nome small { font: 800 .62rem var(--mono); letter-spacing: .32em; margin-top: 3px; }
 
 /* ---------- conteúdo ---------- */
 .hub {

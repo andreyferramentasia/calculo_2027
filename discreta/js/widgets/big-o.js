@@ -45,7 +45,7 @@
         var trava = lg - 9 > 0;   // mais de 1 s
         return '<div class="bigo-linha' + (trava ? ' trava' : '') + '"><b>' + o.t + '</b>' +
           '<div class="bigo-barra"><i style="width:' + w + '%;--c:' + o.c + '"></i></div>' +
-          '<span class="t">' + passos(lg) + ' passos<br>' + tempo(lg) + (trava ? ' ⚠' : '') + '</span></div>';
+          '<span class="t">' + passos(lg) + (lg === 0 ? ' passo' : ' passos') + '<br>' + tempo(lg) + (trava ? ' ⚠' : '') + '</span></div>';
       }).join('');
     }
     inp.addEventListener('input', upd);

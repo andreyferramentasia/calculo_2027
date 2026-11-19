@@ -41,9 +41,9 @@
     var body = A.widgetBox(host, 'Operações com conjuntos no diagrama de Venn');
     body.innerHTML =
       '<div class="widget-row">' +
-      '  <label class="field" style="flex:1 1 180px">A = { <input type="text" class="vA"> }</label>' +
-      '  <label class="field" style="flex:1 1 180px">B = { <input type="text" class="vB"> }</label>' +
-      '  <label class="field" style="flex:1 1 180px">universo S (sobra) = { <input type="text" class="vS"> }</label>' +
+      '  <label class="field" style="flex:1 1 180px">elementos de A <input type="text" class="vA"></label>' +
+      '  <label class="field" style="flex:1 1 180px">elementos de B <input type="text" class="vB"></label>' +
+      '  <label class="field" style="flex:1 1 180px">resto do universo S <input type="text" class="vS"></label>' +
       '</div>' +
       '<div class="venn-ops"></div>' +
       '<svg class="venn-svg" viewBox="0 0 520 290" role="img" aria-label="Diagrama de Venn">' +

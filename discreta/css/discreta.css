@@ -17,7 +17,7 @@ table.tt td.ok { color: var(--ok); font-weight: 800; }
 table.tt td.no { color: var(--bad); font-weight: 800; }
 
 /* ---------- cartões de conceito (conectivos, quantificadores...) ---------- */
-.ideias { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 12px 0 18px; }
+.ideias { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; margin: 12px 0 18px; }
 .ideia { background: var(--panel); border: var(--bw) solid var(--ink); border-radius: var(--radius); box-shadow: var(--shadow-s); padding: 14px 16px; }
 .ideia h4 { margin: 0 0 6px; font: 800 1.05rem var(--display); display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
 .ideia h4 code { font-size: 1rem; }
