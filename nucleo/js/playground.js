@@ -39,6 +39,41 @@
     return loading;
   }
 
+  /* ---------- Python para outras telas (desafio com código) ----------
+     A.pyCarregar(status?) baixa o Pyodide (uma vez só).
+     A.rodarPython(codigo) -> Promise<{ saida, erro }>
+     Roda num espaço de nomes novo, sem input(), com limite de passos
+     (laço infinito vira erro em vez de travar a página). */
+  A.pyCarregar = function (status) { return getPyodide(status || function () {}); };
+  A.pyPronto = function () { return !!pyodide; };
+  var LIMITE_PASSOS = 3000000;
+  A.rodarPython = function (codigo) {
+    return getPyodide(function () {}).then(function (py) {
+      var saida = '';
+      py.setStdout({ batched: function (s) { saida += s + '\n'; } });
+      py.setStderr({ batched: function (s) { saida += s + '\n'; } });
+      py.setStdin({ stdin: function () { throw new Error('input() não funciona aqui: escreva os valores direto no código.'); } });
+      return py.loadPackagesFromImports(codigo).then(function () {
+        py.globals.set('_alg_src', codigo);
+        try {
+          py.runPython(
+            'import sys as _s\n_alg_n = [0]\n' +
+            'def _alg_t(f, e, a):\n    _alg_n[0] += 1\n    if _alg_n[0] > ' + LIMITE_PASSOS + ':\n        raise RuntimeError("o código demorou demais (laço infinito?)")\n    return _alg_t\n' +
+            'def _alg_in(*a):\n    raise RuntimeError("input() não funciona aqui: escreva os valores direto no código")\n' +
+            '_alg_ns = {"__name__": "__main__", "input": _alg_in}\n_s.settrace(_alg_t)\n' +
+            'try:\n    exec(compile(_alg_src, "<seu código>", "exec"), _alg_ns)\nfinally:\n    _s.settrace(None)\n');
+          return { saida: saida.replace(/\n+$/, ''), erro: null };
+        } catch (e) {
+          // só "linha N: Erro: mensagem", sem os detalhes internos
+          var msg = String(e && e.message || e).trim(), ult = msg.split('\n').filter(Boolean).pop();
+          var lns = msg.match(/File "<seu código>", line (\d+)/g);
+          var ln = lns ? lns[lns.length - 1].match(/\d+/)[0] : null;
+          return { saida: saida.replace(/\n+$/, ''), erro: (ln ? 'linha ' + ln + ': ' : '') + ult };
+        }
+      });
+    });
+  };
+
   A.renderPlayground = function (view) {
     view.className = 'content wide';
     document.title = 'Playground Python';

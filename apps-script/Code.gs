@@ -377,7 +377,8 @@ function gravarSessao_(token, s) {
 function publico_(s) {
   return {
     nome: s.nome, ano: s.ano, titulo: secao_(s.materia, s.secao).titulo, total: s.ordem.length,
-    atual: s.atual, acertos: s.acertos, pontos: s.pontos, fim: !!s.fim, salvo: !!s.salvo
+    atual: s.atual, acertos: s.acertos, pontos: s.pontos, fim: !!s.fim, salvo: !!s.salvo,
+    temCodigo: secao_(s.materia, s.secao).perguntas.some(function (p) { return p.tipo === 'codigo'; })
   };
 }
 
@@ -413,7 +414,8 @@ function registra_(s, p, resp, msReal) {
   if (s.atual >= s.ordem.length) s.fim = Date.now();
   s.ultimo = {
     i: s.atual - 1, certo: certo, fracao: c.fracao, correta: c.correta, ganhou: pts,
-    tempo_esgotado: !noTempo, explica: p.explica || null
+    tempo_esgotado: !noTempo, explica: p.explica || null,
+    solucao: c.solucao || null, motivo: c.motivo || null
   };
 }
 
@@ -424,9 +426,12 @@ function registra_(s, p, resp, msReal) {
    ordenar  { itens: [na ordem CERTA] }                         o servidor embaralha
    associar { pares: [[esquerda, direita], ...] }               o servidor embaralha a direita
    tabela   { cab: ['A','B','A → B'], linhas: [['V','V'],...], certa: [true, false, ...] }
+   codigo   { inicial: 'código de partida', aceita: ['saída esperada'], solucao: 'código',
+              semLiteral?: ['5040'], proibe?: ['statistics'], exige?: ['for'] }
+            o aluno escreve e roda Python no navegador; confere-se a SAÍDA e o código
    Todos aceitam: q, code?, tempo, explica? (aparece depois de responder) */
 function tipo_(p) {
-  return ['vf', 'numero', 'ordenar', 'associar', 'tabela'].indexOf(p.tipo) >= 0 ? p.tipo : 'escolha';
+  return ['vf', 'numero', 'ordenar', 'associar', 'tabela', 'codigo'].indexOf(p.tipo) >= 0 ? p.tipo : 'escolha';
 }
 
 function permServir_(p) {
@@ -453,7 +458,32 @@ function publicaPergunta_(p, perm) {
     o.dir = perm.map(function (i) { return p.pares[i][1]; });
   }
   if (t === 'tabela') { o.cab = p.cab; o.linhas = p.linhas; }
+  if (t === 'codigo') { o.inicial = p.inicial || ''; o.dica = p.dica || null; }
   return o;
+}
+
+/* saída: ignora espaços no fim das linhas e linhas vazias no fim */
+function normSaida_(v) {
+  return String(v).replace(/\r/g, '').split('\n').map(function (l) { return l.replace(/\s+$/, ''); }).join('\n').trim();
+}
+
+function corrigeCodigo_(p, v) {
+  const r = { fracao: 0, correta: [].concat(p.aceita)[0], solucao: p.solucao || null, motivo: null };
+  if (!v || typeof v !== 'object' || typeof v.codigo !== 'string' || typeof v.saida !== 'string') return r;
+  if (v.codigo.length > 5000 || v.saida.length > 3000) return r;
+  const cod = v.codigo.replace(/#.*$/gm, '');               // comentários não contam
+  const lit = (p.semLiteral || []).filter(function (x) {
+    // o número aparece "solto" no código (não vale 1024 conter 10)
+    return new RegExp('(^|[^0-9.])' + String(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![0-9])').test(cod);
+  });
+  if (lit.length) { r.motivo = 'O código já tinha a resposta (' + lit[0] + ') escrita: era para o programa calcular.'; return r; }
+  const proib = (p.proibe || []).filter(function (x) { return cod.indexOf(x) >= 0; });
+  if (proib.length) { r.motivo = 'Nesta pergunta não vale usar ' + proib[0] + '.'; return r; }
+  const falta = (p.exige || []).filter(function (x) { return cod.indexOf(x) < 0; });
+  if (falta.length) { r.motivo = 'O código precisava usar ' + falta[0] + '.'; return r; }
+  const ok = [].concat(p.aceita).some(function (a) { return normSaida_(a) === normSaida_(v.saida); });
+  r.fracao = ok ? 1 : 0;
+  return r;
 }
 
 function normResp_(v) {
@@ -473,6 +503,7 @@ function corrige_(p, perm, v) {
     const c = p.certa ? 0 : 1;
     return { fracao: v === c ? 1 : 0, correta: c };
   }
+  if (t === 'codigo') return corrigeCodigo_(p, v);
   if (t === 'numero') {
     const ok = [].concat(p.aceita);
     const certo = typeof v === 'string' && v.length <= 40 && ok.some(function (a) { return normResp_(a) === normResp_(v); });

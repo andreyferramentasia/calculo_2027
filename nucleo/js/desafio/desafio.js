@@ -43,7 +43,7 @@
     document.addEventListener(ev, bloqueia, true);
   });
   document.addEventListener('selectstart', function (e) {
-    if (A.desafioAtivo && !(e.target.closest && e.target.closest('input'))) e.preventDefault();
+    if (A.desafioAtivo && !(e.target.closest && e.target.closest('input, textarea'))) e.preventDefault();
   }, true);
   document.addEventListener('keydown', function (e) {
     if (!A.desafioAtivo) return;
@@ -120,8 +120,9 @@
         go.disabled = true; erro.textContent = '';
         var tok = A.novoToken();
         A.desafioApi('iniciar', { materia: A.MATERIA, secao: id, nome: nome, ano: Number(f.ano.value), token: tok }, { aoRepetir: function () { erro.textContent = 'Muita gente ao mesmo tempo… tentando de novo ⏳'; } })
-          .then(function () {
+          .then(function (r) {
             sessao.set(key, tok);
+            if (r && r.temCodigo && A.pyCarregar) A.pyCarregar();   // baixa o Python enquanto responde as outras
             proxima(tok);
           })
           .catch(function (err) {

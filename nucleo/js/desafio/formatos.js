@@ -174,6 +174,70 @@
     }
   };
 
+  /* ---------- escrever código: roda em Python de verdade e envia a saída ----------
+     O servidor confere a SAÍDA (e se o código não trapaceou com a resposta pronta). */
+  F.codigo = {
+    rotulo: 'ESCREVA O CÓDIGO',
+    montar: function (box, d, enviar) {
+      var w = A.el('div', 'd-codigo');
+      w.innerHTML =
+        '<div class="d-cod-bar"><span>main.py</span><span class="d-cod-st">carregando o Python…</span></div>' +
+        '<textarea spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Seu código"></textarea>' +
+        '<div class="d-cod-acoes"><button type="button" class="btn d-rodar" disabled>▶ Rodar</button>' +
+        '<button type="button" class="btn primary d-confirma" disabled>Enviar resposta ✔</button>' +
+        '<span class="muted d-cod-dica">Rode o código; a saída que aparecer é a sua resposta.</span></div>' +
+        '<pre class="d-saida" hidden></pre>';
+      box.appendChild(w);
+      var ta = A.$('textarea', w), rodar = A.$('.d-rodar', w), env = A.$('.d-confirma', w), st = A.$('.d-cod-st', w), out = A.$('.d-saida', w);
+      ta.value = d.inicial || '';
+      ta.rows = Math.max(7, ta.value.split('\n').length + 3);
+      var ultima = null, travado = false;          // { codigo, saida } da última vez que rodou sem erro
+      function sujo() { env.disabled = !ultima || ultima.codigo !== ta.value || travado; }
+      ta.addEventListener('input', sujo);
+      ta.addEventListener('keydown', function (e) {
+        if (e.key === 'Tab') {                    // Tab = 4 espaços
+          e.preventDefault();
+          var s = ta.selectionStart;
+          ta.value = ta.value.slice(0, s) + '    ' + ta.value.slice(ta.selectionEnd);
+          ta.selectionStart = ta.selectionEnd = s + 4;
+          sujo();
+        }
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); if (!rodar.disabled) rodar.click(); }
+      });
+      A.pyCarregar(function (m) { st.textContent = m; }).then(function () {
+        st.textContent = 'Python pronto ✓'; st.classList.add('ok');
+        if (!travado) rodar.disabled = false;
+      }).catch(function (e) { st.textContent = '⚠ ' + e.message; });
+      rodar.onclick = function () {
+        rodar.disabled = true;
+        var cod = ta.value;
+        A.rodarPython(cod).then(function (r) {
+          out.hidden = false;
+          out.className = 'd-saida' + (r.erro ? ' err' : '');
+          out.textContent = (r.saida || '') + (r.erro ? (r.saida ? '\n' : '') + '⚠ ' + r.erro : '') || '(nada foi impresso: use print)';
+          ultima = r.erro || !r.saida ? null : { codigo: cod, saida: r.saida };
+          sujo();
+        }).then(function () { if (!travado) rodar.disabled = false; });
+      };
+      env.onclick = function () { if (ultima) enviar({ codigo: ultima.codigo, saida: ultima.saida }); };
+      return {
+        travar: function () { travado = true; ta.readOnly = true; rodar.disabled = true; env.disabled = true; },
+        mostrar: function (r) {
+          out.hidden = false;
+          out.classList.add(r.certo ? 'ok' : 'err');
+          if (r.motivo) { var m = A.el('p', 'd-gab-tit'); m.textContent = '⚠ ' + r.motivo; w.appendChild(m); }
+          if (r.solucao) {
+            var t = A.el('p', 'd-gab-tit', 'Uma solução:');
+            var pre = A.el('pre', 'd-code');
+            pre.innerHTML = A.highlight(r.solucao);
+            w.appendChild(t); w.appendChild(pre);
+          }
+        }
+      };
+    },
+    resposta: function (r) { return 'saída esperada: ' + r.correta; }
+  };
+
   /* ---------- completar a tabela-verdade ---------- */
   F.tabela = {
     rotulo: 'COMPLETE A TABELA',

@@ -96,11 +96,42 @@ a { color: inherit; text-decoration: none; }
   border-radius: 14px;
   box-shadow: 3px 3px 0 #17171c;
   transform: rotate(-1.5deg);
+  cursor: default;
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s cubic-bezier(.34,1.56,.64,1);
 }
-.unigran img { width: 40px; height: 40px; display: block; }
+.unigran-logo { width: 40px; height: 40px; display: block; overflow: visible; }
 .unigran-nome { display: grid; line-height: 1; }
 .unigran-nome b { font: 800 1.25rem var(--display); letter-spacing: -.01em; color: #1f63c6; }
 .unigran-nome small { font: 800 .62rem var(--mono); letter-spacing: .32em; margin-top: 3px; }
+
+/* hover: a placa se endireita e "abre" — as setas se soltam para os cantos,
+   o U salta e a sombra se afasta, como se a marca rachasse de leve */
+.unigran-logo > *,
+.unigran-nome b,
+.unigran-nome small {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform .4s cubic-bezier(.34,1.56,.64,1), letter-spacing .4s cubic-bezier(.34,1.56,.64,1);
+}
+.unigran:hover {
+  transform: rotate(0deg) translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #17171c;
+}
+.unigran:hover .ul-sombra   { transform: translate(2.5px, 2.5px); }
+.unigran:hover .ul-placa    { transform: rotate(-3deg) scale(1.03); }
+.unigran:hover .ul-azul     { transform: translate(-5px, -5px) rotate(-9deg); }
+.unigran:hover .ul-amarela  { transform: translate(5px, 5px) rotate(-9deg); }
+.unigran:hover .ul-u        { transform: translateY(-2px) scale(1.18) rotate(4deg); }
+.unigran:hover .unigran-nome b     { transform: translate(2px, -1px) rotate(-2deg); letter-spacing: .03em; }
+.unigran:hover .unigran-nome small { transform: translate(-1px, 1px) rotate(1.5deg); letter-spacing: .42em; }
+/* atraso escalonado: as peças se soltam uma depois da outra */
+.unigran:hover .ul-amarela { transition-delay: .05s; }
+.unigran:hover .ul-u       { transition-delay: .08s; }
+.unigran:hover .unigran-nome small { transition-delay: .06s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .unigran, .unigran * { transition: none !important; }
+}
 
 /* ---------- conteúdo ---------- */
 .hub {

@@ -31,7 +31,8 @@ Versão: Nova versão → Implantar**. A URL continua a mesma.
 ### Formatos de pergunta
 Além da múltipla escolha, cada pergunta pode ter `tipo`: `vf` (verdadeiro/falso),
 `numero` (digitar a resposta), `ordenar` (pôr passos em ordem), `associar` (ligar
-colunas) e `tabela` (completar tabela-verdade). O campo `explica` aparece para o aluno
+colunas), `tabela` (completar tabela-verdade) e `codigo` (o aluno escreve e roda Python
+no próprio desafio; vale a saída do programa, e dá para proibir a resposta escrita direto no código). O campo `explica` aparece para o aluno
 depois que ele responde. Formato completo no topo de `Questoes.gs`.
 Ordenar, associar e tabela dão metade dos pontos (proporcional) quando o aluno acerta pelo menos metade.
 

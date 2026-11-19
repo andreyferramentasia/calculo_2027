@@ -6,7 +6,7 @@
 
 /* nada selecionável durante o desafio (exceto os campos) */
 .content.desafio { user-select: none; -webkit-user-select: none; }
-.content.desafio input { user-select: text; -webkit-user-select: text; }
+.content.desafio input, .content.desafio textarea { user-select: text; -webkit-user-select: text; }
 
 .d-stage { max-width: 980px; margin: 0 auto; }
 .content.desafio .lesson-head { max-width: 980px; margin-left: auto; margin-right: auto; }
@@ -283,3 +283,22 @@ table.d-tt td.err { background: #ffd0dc; }
   .d-item { grid-template-columns: 30px 1fr; }
   .d-setas { grid-column: 1 / -1; justify-content: flex-end; }
 }
+
+/* escrever código */
+.d-opcoes.d-f-codigo { display: block; }
+.d-codigo { border: var(--bw) solid var(--ink); border-radius: 16px; overflow: hidden; background: var(--code-bg); box-shadow: 4px 4px 0 var(--hard); }
+.d-cod-bar { display: flex; justify-content: space-between; gap: 10px; padding: 8px 14px; background: var(--code-bg2); color: var(--code-faint); font: 700 .8rem var(--mono); }
+.d-cod-st.ok { color: #86efac; }
+.d-codigo textarea {
+  display: block; width: 100%; box-sizing: border-box; resize: vertical; border: 0; outline: none;
+  background: var(--code-bg); color: var(--code-text); padding: 12px 14px;
+  font: 1rem/1.55 var(--mono); font-variant-ligatures: none; tab-size: 4;
+}
+.d-cod-acoes { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 10px 14px; background: var(--panel); border-top: 2px solid var(--ink); }
+.d-cod-acoes .d-confirma { margin-top: 0; }
+.d-cod-dica { font-size: .85rem; }
+.d-saida { margin: 0; padding: 12px 14px; background: #0b0c0f; color: #e5e7eb; font: .95rem/1.5 var(--mono); white-space: pre-wrap; border-top: 2px solid var(--ink); max-height: 220px; overflow: auto; }
+.d-saida.err { color: #fca5a5; }
+.d-saida.ok { box-shadow: inset 6px 0 0 #22c55e; }
+.d-codigo > .d-gab-tit { margin: 0; padding: 10px 14px 4px; background: var(--panel); color: var(--text); }
+.d-codigo > .d-code { margin: 0; border-radius: 0; }
