@@ -155,16 +155,13 @@
       A.$('.d-pts', g).textContent = d.pontos + ' pts';
       A.$('.d-qtext', g).innerHTML = d.q;
       if (d.code) { var pre = A.$('.d-code', g); pre.hidden = false; pre.innerHTML = A.highlight(d.code); }
-      var ops = A.$('.d-opcoes', g), botoes = [];
-      d.opcoes.forEach(function (o, k) {
-        var b = A.el('button', 'd-op d-op' + k);
-        b.type = 'button';
-        b.innerHTML = '<span class="d-letra">' + 'ABCD'[k] + '</span><span class="d-txt"></span>';
-        A.$('.d-txt', b).textContent = o;      // texto puro: nunca HTML
-        b.onclick = function () { responde(k); };
-        ops.appendChild(b);
-        botoes.push(b);
-      });
+      // área de resposta conforme o formato (js/desafio/formatos.js)
+      var tipo = A.desafioFormatos[d.tipo] ? d.tipo : 'escolha';
+      var fmt = A.desafioFormatos[tipo];
+      var ops = A.$('.d-opcoes', g);
+      ops.classList.add('d-f-' + tipo);
+      A.$('.d-tipo', g).textContent = fmt.rotulo;
+      var ui = fmt.montar(ops, d, responde);
 
       // cronômetro (o servidor também confere o tempo)
       var barra = A.$('.d-timer i', g), seg = A.$('.d-seg', g);
@@ -176,34 +173,41 @@
         barra.style.width = (resta / (d.tempo * 1000) * 100) + '%';
         seg.textContent = Math.ceil(resta / 1000);
         g.classList.toggle('urgente', resta < 5000);
-        if (resta <= 0) { responde(-1); return; }
+        if (resta <= 0) { responde(null); return; }
         raf = requestAnimationFrame(tick);
       }
 
-      function responde(k) {
+      /* v = resposta do formato (índice, texto, lista...); null = tempo esgotado */
+      function responde(v) {
         if (respondido) return;
         respondido = true;
         emPergunta = false;
         cancelAnimationFrame(raf);
         g.classList.remove('urgente');
-        botoes.forEach(function (b, j) { b.disabled = true; if (j === k) b.classList.add('escolhida'); });
-        A.desafioApi('responder', { token: tok, i: d.i, escolha: k, saidas: saidas }, { aoRepetir: avisoFila }).then(function (r) {
+        ui.travar(v);
+        A.desafioApi('responder', {
+          token: tok, i: d.i, resposta: v,
+          escolha: typeof v === 'number' ? v : -1,      // servidores antigos só leem "escolha"
+          saidas: saidas
+        }, { aoRepetir: avisoFila }).then(function (r) {
           if (!vivo()) return;
           var fila = A.$('.d-fila', stage); if (fila) fila.remove();
-          botoes.forEach(function (b, j) {
-            if (j === r.correta) b.classList.add('certa');
-            else b.classList.add('apagada');
-          });
+          ui.mostrar(r);
+          var parcial = !r.certo && r.fracao >= 0.5;
           var fb = A.$('.d-feedback', g);
           fb.hidden = false;
-          fb.classList.add(r.certo ? 'ok' : 'err');
-          A.$('.d-fb-title', fb).textContent = r.certo ? '✔ Certo!' : (k < 0 || r.tempo_esgotado ? '⏰ Tempo esgotado' : '✘ Errou');
-          A.$('.d-fb-pts', fb).textContent = r.certo ? '+' + r.ganhou + ' pts' : 'resposta: ' + 'ABCD'[r.correta];
+          fb.classList.add(r.certo ? 'ok' : parcial ? 'meio' : 'err');
+          A.$('.d-fb-title', fb).textContent = r.certo ? '✔ Certo!' :
+            (v === null || r.tempo_esgotado) ? '⏰ Tempo esgotado' :
+            parcial ? '◐ Quase! ' + Math.round(r.fracao * 100) + '% certo' : '✘ Errou';
+          A.$('.d-fb-pts', fb).textContent = r.ganhou > 0 ? '+' + r.ganhou + ' pts' : (!r.certo && fmt.resposta ? fmt.resposta(r, d) : '');
+          if (r.explica) { var ex = A.$('.d-fb-exp', fb); ex.hidden = false; ex.textContent = '💡 ' + r.explica; }
           A.$('.d-pts', g).textContent = r.pontos + ' pts';
           var nx = A.$('.d-next', fb);
           nx.textContent = r.fim ? 'Ver resultado →' : 'Próxima →';
           nx.onclick = function () { nx.disabled = true; proxima(tok); };
-          nx.focus();
+          nx.focus({ preventScroll: true });
+          fb.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }).catch(function (err) {
           if (err.status === 409) proxima(tok);       // já respondida (outra aba / repetição)
           else erroTela(err);

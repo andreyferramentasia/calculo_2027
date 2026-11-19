@@ -14,7 +14,8 @@
     {
       id: 'discreta', icon: '∀', color: '#8fb8ff',
       title: 'Matemática Discreta',
-      desc: 'Lógica, conjuntos, relações, indução e contagem.'
+      desc: 'Lógica, demonstrações, indução, conjuntos, contagem, RSA e Big O, com Python e exemplos interativos.',
+      href: 'discreta/index.html'
     },
     {
       id: 'probabilidade', icon: 'σ', color: '#ff5c93', tag: 'CEAD',

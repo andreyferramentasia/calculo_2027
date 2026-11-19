@@ -27,6 +27,13 @@ Versão: Nova versão → Implantar**. A URL continua a mesma.
 `Questoes.gs` → `QUESTOES[<matéria>].secoes[<seção>]`. O id da matéria é o mesmo de
 `js/hub.js` e de `MATERIA` em `<matéria>/js/desafio/config.js`.
 
+### Formatos de pergunta
+Além da múltipla escolha, cada pergunta pode ter `tipo`: `vf` (verdadeiro/falso),
+`numero` (digitar a resposta), `ordenar` (pôr passos em ordem), `associar` (ligar
+colunas) e `tabela` (completar tabela-verdade). O campo `explica` aparece para o aluno
+depois que ele responde. Formato completo no topo de `Questoes.gs`.
+Ordenar, associar e tabela dão metade dos pontos (proporcional) quando o aluno acerta pelo menos metade.
+
 ## Onde ficam os dados
 Propriedades do script (JSON): `liberados` (por matéria) e uma chave
 `r|<matéria>|<seção>|<ano>|<nome>` por resultado.

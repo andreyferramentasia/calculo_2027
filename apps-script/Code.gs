@@ -111,7 +111,7 @@ function iniciar(d) {
     const s = {
       materia: materia, secao: secao, ano: ano, nome: nome, chave: chave,
       ordem: embaralha_(secao_(materia, secao).perguntas.length),
-      atual: 0, servido: null, acertos: 0, pontos: 0, saidas: 0,
+      atual: 0, servido: null, perm: null, acertos: 0, pontos: 0, saidas: 0,
       inicio: Date.now(), fim: null, ultimo: null, salvo: false
     };
     gravarSessao_(token, s);
@@ -129,7 +129,7 @@ function pergunta(d) {
   saidas_(s, d.saidas);
   if (s.atual < total && s.servido) {                // pergunta abandonada: conta como errada
     const p0 = q.perguntas[s.ordem[s.atual]];
-    if ((Date.now() - s.servido) / 1000 > (p0.tempo || 20) + TOLERANCIA_S) registra_(s, p0, -1, Date.now() - s.servido);
+    if ((Date.now() - s.servido) / 1000 > (p0.tempo || 20) + TOLERANCIA_S) registra_(s, p0, null, Date.now() - s.servido);
   }
   if (s.atual >= total) {
     gravarSessao_(token, s);
@@ -137,14 +137,15 @@ function pergunta(d) {
   }
   const p = q.perguntas[s.ordem[s.atual]];
   const lim = p.tempo || 20;
-  if (!s.servido) s.servido = Date.now();
+  if (!s.servido) { s.servido = Date.now(); s.perm = permServir_(p); }
+  if (!s.perm && permServir_(p)) s.perm = permServir_(p);
   gravarSessao_(token, s);
-  return {
+  return Object.assign({
     i: s.atual, total: total, nome: s.nome, titulo: q.titulo,
-    q: p.q, code: p.code || null, opcoes: p.opcoes,
+    q: p.q, code: p.code || null,
     tempo: lim, restante: Math.max(0, lim - (Date.now() - s.servido) / 1000),
     acertos: s.acertos, pontos: s.pontos
-  };
+  }, publicaPergunta_(p, s.perm));
 }
 
 function responder(d) {
@@ -155,8 +156,9 @@ function responder(d) {
   if (i !== s.atual || !s.servido || s.atual >= s.ordem.length) falha_(409, 'Pergunta já respondida.');
   saidas_(s, d.saidas);
   const p = secao_(s.materia, s.secao).perguntas[s.ordem[s.atual]];
-  const escolha = Number.isInteger(d.escolha) ? d.escolha : -1;
-  registra_(s, p, escolha, Date.now() - s.servido);
+  // "resposta" (formatos novos); "escolha" é do site antigo (só múltipla escolha)
+  const resp = d.resposta !== undefined ? d.resposta : (Number.isInteger(d.escolha) && d.escolha >= 0 ? d.escolha : null);
+  registra_(s, p, resp, Date.now() - s.servido);
   gravarSessao_(token, s);
   return resposta_(s);
 }
@@ -391,17 +393,112 @@ function resposta_(s) {
   return Object.assign({}, s.ultimo, { acertos: s.acertos, pontos: s.pontos, fim: !!s.fim });
 }
 
-function registra_(s, p, escolha, msReal) {
+/* corrige a resposta conforme o formato e soma os pontos.
+   Acerto total: 500 a 1000 pts (mais rápido = mais).
+   Ordenar/associar/tabela com pelo menos metade certa: metade dos pontos, proporcional. */
+function registra_(s, p, resp, msReal) {
   const lim = p.tempo || 20;
   const noTempo = msReal <= (lim + TOLERANCIA_S) * 1000;
-  const certo = noTempo && escolha === p.certa;
+  const c = corrige_(p, s.perm, noTempo ? resp : null);
+  const certo = c.fracao === 1;
   const ms = Math.min(msReal, lim * 1000);
-  const pts = certo ? Math.round(1000 * (1 - ms / (lim * 1000) / 2)) : 0;   // 500 a 1000
+  const base = Math.round(1000 * (1 - ms / (lim * 1000) / 2));   // 500 a 1000
+  const multi = ['ordenar', 'associar', 'tabela'].indexOf(tipo_(p)) >= 0;
+  const pts = certo ? base : (multi && c.fracao >= 0.5 ? Math.round(base * c.fracao / 2) : 0);   // parcial só a partir da metade
   s.atual++;
   s.servido = null;
-  if (certo) { s.acertos++; s.pontos += pts; }
+  s.perm = null;
+  if (certo) s.acertos++;
+  s.pontos += pts;
   if (s.atual >= s.ordem.length) s.fim = Date.now();
-  s.ultimo = { i: s.atual - 1, certo: certo, correta: p.certa, ganhou: pts, tempo_esgotado: !noTempo };
+  s.ultimo = {
+    i: s.atual - 1, certo: certo, fracao: c.fracao, correta: c.correta, ganhou: pts,
+    tempo_esgotado: !noTempo, explica: p.explica || null
+  };
+}
+
+/* ======================= formatos de pergunta =======================
+   escolha  { opcoes: [4 textos], certa: 0-3 }                 (padrão)
+   vf       { certa: true | false }
+   numero   { aceita: ['5040', ...], mostrar?, dica? }          resposta digitada
+   ordenar  { itens: [na ordem CERTA] }                         o servidor embaralha
+   associar { pares: [[esquerda, direita], ...] }               o servidor embaralha a direita
+   tabela   { cab: ['A','B','A → B'], linhas: [['V','V'],...], certa: [true, false, ...] }
+   Todos aceitam: q, code?, tempo, explica? (aparece depois de responder) */
+function tipo_(p) {
+  return ['vf', 'numero', 'ordenar', 'associar', 'tabela'].indexOf(p.tipo) >= 0 ? p.tipo : 'escolha';
+}
+
+function permServir_(p) {
+  const t = tipo_(p);
+  if (t === 'ordenar') {
+    const n = p.itens.length;
+    let a, k = 0;
+    do { a = embaralha_(n); k++; } while (n > 1 && k < 20 && a.every(function (v, i) { return v === i; }));
+    return a;
+  }
+  if (t === 'associar') return embaralha_(p.pares.length);
+  return null;
+}
+
+/* o que o aluno recebe (nunca a resposta) */
+function publicaPergunta_(p, perm) {
+  const t = tipo_(p);
+  const o = { tipo: t };
+  if (t === 'escolha') o.opcoes = p.opcoes;
+  if (t === 'numero') o.dica = p.dica || null;
+  if (t === 'ordenar') o.itens = perm.map(function (i) { return p.itens[i]; });
+  if (t === 'associar') {
+    o.esq = p.pares.map(function (x) { return x[0]; });
+    o.dir = perm.map(function (i) { return p.pares[i][1]; });
+  }
+  if (t === 'tabela') { o.cab = p.cab; o.linhas = p.linhas; }
+  return o;
+}
+
+function normResp_(v) {
+  return String(v).normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\s+/g, '');
+}
+
+function listaInt_(v, n) {
+  return Array.isArray(v) && v.length === n && v.every(function (x) { return Number.isInteger(x) && x >= -1 && x < n; });
+}
+
+/* devolve { fracao: 0..1, correta: gabarito no formato que o site mostra } */
+function corrige_(p, perm, v) {
+  const t = tipo_(p);
+  if (!perm && (t === 'ordenar' || t === 'associar')) perm = (p.itens || p.pares).map(function (_, i) { return i; });
+  if (t === 'escolha') return { fracao: v === p.certa ? 1 : 0, correta: p.certa };
+  if (t === 'vf') {
+    const c = p.certa ? 0 : 1;
+    return { fracao: v === c ? 1 : 0, correta: c };
+  }
+  if (t === 'numero') {
+    const ok = [].concat(p.aceita);
+    const certo = typeof v === 'string' && v.length <= 40 && ok.some(function (a) { return normResp_(a) === normResp_(v); });
+    return { fracao: certo ? 1 : 0, correta: p.mostrar || String(ok[0]) };
+  }
+  if (t === 'ordenar') {
+    const n = p.itens.length;
+    const correta = [];
+    for (let k = 0; k < n; k++) correta.push(perm.indexOf(k));
+    let f = 0;
+    if (listaInt_(v, n) && new Set(v).size === n && v.indexOf(-1) < 0) {
+      f = v.filter(function (j, pos) { return perm[j] === pos; }).length / n;
+    }
+    return { fracao: f, correta: correta };
+  }
+  if (t === 'associar') {
+    const n = p.pares.length;
+    const correta = [];
+    for (let i = 0; i < n; i++) correta.push(perm.indexOf(i));
+    const f = listaInt_(v, n) ? v.filter(function (j, i) { return j >= 0 && perm[j] === i; }).length / n : 0;
+    return { fracao: f, correta: correta };
+  }
+  // tabela
+  const n = p.certa.length;
+  const f = Array.isArray(v) && v.length === n ? v.filter(function (x, i) { return x === p.certa[i]; }).length / n : 0;
+  return { fracao: f, correta: p.certa };
 }
 
 function saidas_(s, v) {

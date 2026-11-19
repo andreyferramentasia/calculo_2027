@@ -6,8 +6,10 @@
 (function (A) {
   var PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
   var pyodide = null, loading = null;
+  // código salvo separado por matéria (calculo mantém a chave antiga)
+  var PG_KEY = !A.MATERIA || A.MATERIA === 'calculo' ? 'pg:code' : 'pg:code:' + A.MATERIA;
 
-  var EXAMPLES = {
+  var EXAMPLES = A.PG_EXAMPLES || {
     'Olá, mundo': 'nome = "Python"\nprint(f"Olá, {nome}!")\nfor i in range(3):\n    print("volta", i)',
     'Tabuada': 'n = 7\nfor i in range(1, 11):\n    print(f"{n} x {i:2} = {n * i:3}")',
     'Bubble Sort': 'v = [5, 2, 8, 1, 9, 3]\nn = len(v)\nfor i in range(n - 1):\n    for j in range(n - 1 - i):\n        if v[j] > v[j + 1]:\n            v[j], v[j + 1] = v[j + 1], v[j]\n    print(f"passada {i + 1}: {v}")',
@@ -42,7 +44,7 @@
     document.title = 'Playground Python';
     var pending = A.store.get('pg:pending', null);
     if (pending) A.store.set('pg:pending', null);
-    var code = pending || A.store.get('pg:code', EXAMPLES['Olá, mundo']);
+    var code = pending || A.store.get(PG_KEY, EXAMPLES[Object.keys(EXAMPLES)[0]]);
 
     var back = A.store.get('pg:return', null);
     view.innerHTML =
@@ -78,7 +80,7 @@
       var g = '';
       for (var i = 1; i <= n; i++) g += i + '\n';
       gutter.textContent = g;
-      A.store.set('pg:code', ta.value);
+      A.store.set(PG_KEY, ta.value);
     }
     ta.addEventListener('input', sync);
     ta.addEventListener('scroll', function () {

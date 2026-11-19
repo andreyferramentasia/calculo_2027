@@ -23,6 +23,7 @@
     <button class="btn primary d-go" type="submit">Entrar no desafio →</button>
     <ul class="d-regras">
       <li>Cada pergunta tem tempo. Mais rápido = mais pontos.</li>
+      <li>Tem pergunta de vários jeitos: escolher, V ou F, digitar, ordenar, associar e completar tabela.</li>
       <li>Copiar e colar estão bloqueados.</li>
       <li>Você só pode participar <b>uma vez</b>.</li>
     </ul>
@@ -38,6 +39,7 @@
     </div>
     <div class="d-timer"><i></i><b class="d-seg"></b></div>
     <div class="d-card d-q">
+      <span class="d-kicker d-tipo"></span>
       <h2 class="d-qtext"></h2>
       <pre class="d-code" hidden></pre>
     </div>
@@ -46,6 +48,7 @@
       <b class="d-fb-title"></b>
       <span class="d-fb-pts"></span>
       <button class="btn d-next" type="button">Próxima →</button>
+      <p class="d-fb-exp" hidden></p>
     </div>
   </div>
 </template>

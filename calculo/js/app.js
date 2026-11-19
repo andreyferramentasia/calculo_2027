@@ -42,18 +42,19 @@
     var labs = 0, widgets = 0;
     A.lessons.forEach(function (l) { l.body.forEach(function (s) { if (s.lab) labs++; if (s.widget) widgets++; }); });
     var first = sorted()[0];
+    var S = A.SITE || {};
     var html =
       '<section class="hero">' +
       '  <div>' +
-      '    <span class="eyebrow">algoritmos · python · do zero às matrizes</span>' +
-      '    <h1>Veja o código <span>rodando</span>, linha por linha.</h1>' +
-      '    <p>Aulas de algoritmos em Python com animações passo a passo: acompanhe a memória, os loops dando voltas, ponteiros andando em vetores e matrizes sendo multiplicadas.</p>' +
+      '    <span class="eyebrow">' + (S.eyebrow || 'algoritmos · python · do zero às matrizes') + '</span>' +
+      '    <h1>' + (S.h1 || 'Veja o código <span>rodando</span>, linha por linha.') + '</h1>' +
+      '    <p>' + (S.intro || 'Aulas de algoritmos em Python com animações passo a passo: acompanhe a memória, os loops dando voltas, ponteiros andando em vetores e matrizes sendo multiplicadas.') + '</p>' +
       '    <div class="actions">' +
       '      <a class="btn primary" href="#/aula/' + first.id + '">Começar agora →</a>' +
       '      <a class="btn" href="#/playground">Abrir o Playground</a>' +
       '    </div>' +
       '  </div>' +
-      '  <img src="img/hero-loop.svg" alt="Ilustração de um loop: condição, corpo e atualização girando em círculo">' +
+      '  <img src="' + (S.hero || 'img/hero-loop.svg') + '" alt="' + A.esc(S.heroAlt || 'Ilustração de um loop: condição, corpo e atualização girando em círculo') + '">' +
       '</section>' +
       '<div class="stats">' +
       '  <div class="stat"><b>' + A.lessons.length + '</b><span>aulas</span></div>' +
@@ -72,7 +73,7 @@
     html += '</div>';
     view.className = 'content';
     view.innerHTML = html;
-    document.title = 'Algoritmos em Python';
+    document.title = S.titulo || 'Algoritmos em Python';
   }
 
   var SECTION = {
